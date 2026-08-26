@@ -1,0 +1,40 @@
+// 云函数 getSpotsNearby：geoNear 附近搜索 + 按角色过滤可见性
+const cloud = require('wx-server-sdk')
+cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
+const db = cloud.database()
+const _ = db.command
+
+exports.main = async (event) => {
+  const { OPENID } = cloud.getWXContext()
+  const { lng, lat, maxDistance = 5000 } = event
+
+  if (!lng || !lat) return { ok: false, code: 'INVALID', message: '缺少坐标' }
+
+  // 角色
+  let role = 'normal'
+  try {
+    const u = await db.collection('users').doc(OPENID).get()
+    role = u.data.role
+  } catch (e) {}
+
+  const visCond = role === 'vip' ? _.in(['public', 'vip']) : 'public'
+
+  // 主查询：附近公开/VIP 地点
+  const main = await db.collection('spots')
+    .where({
+      'current.location': _.geoNear({
+        geometry: db.Geo.Point(lng, lat),
+        maxDistance,
+      }),
+      visibility: visCond,
+    })
+    .limit(100)
+    .get()
+
+  // 附查询：创建者自己的 private 地点
+  const priv = await db.collection('spots')
+    .where({ creatorOpenid: OPENID, visibility: 'private' })
+    .get()
+
+  return { ok: true, data: main.data.concat(priv.data) }
+}
