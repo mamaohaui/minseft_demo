@@ -1,0 +1,12 @@
+<view class="container">
+  <view class="header">角色：{{user ? user.role : '...'}}</view>
+
+  <view class="section-title">我的收藏</view>
+  <view wx:if="{{favorites.length === 0}}" class="empty">暂无收藏</view>
+  <view wx:for="{{favorites}}" wx:key="_id" class="item" data-id="{{item._id}}" bindtap="goDetail">
+    <view class="t">{{item.current.title}}</view>
+    <view class="s">{{item.current.category}}</view>
+  </view>
+
+  <button class="admin-btn" bindtap="goAdmin">管理员审核</button>
+</view>

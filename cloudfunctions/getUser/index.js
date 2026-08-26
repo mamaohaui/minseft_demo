@@ -28,5 +28,5 @@ exports.main = async () => {
     user = newUser
   }
 
-  return { ok: true, data: user }
+  return { ok: true, data: { _id: OPENID, ...user } }
 }

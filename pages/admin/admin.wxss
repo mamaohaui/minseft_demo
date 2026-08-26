@@ -1,0 +1,7 @@
+.container { padding: 24rpx; }
+.empty { text-align: center; color: #999; padding: 80rpx 0; }
+.item { border: 1rpx solid #eee; border-radius: 8rpx; padding: 24rpx; margin-bottom: 20rpx; }
+.t { font-size: 30rpx; font-weight: bold; }
+.s { color: #666; font-size: 26rpx; margin: 8rpx 0; }
+.tag { display: inline-block; background: #f0ad4e; color: #fff; font-size: 22rpx; padding: 4rpx 12rpx; border-radius: 4rpx; }
+.btns { margin-top: 16rpx; display: flex; gap: 16rpx; }

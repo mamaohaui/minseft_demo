@@ -1,0 +1,9 @@
+<view class="search-bar">
+  <input value="{{keyword}}" placeholder="搜索品类/名称，如「小吃」" bindinput="onInput" confirm-type="search" bindconfirm="doSearch" />
+  <button size="mini" bindtap="doSearch">搜索</button>
+</view>
+<view wx:for="{{results}}" wx:key="_id" class="item" data-id="{{item._id}}" bindtap="goDetail">
+  <view class="t">{{item.current.title}}</view>
+  <view class="s">{{item.current.category}} · {{item.current.timeSlot}}</view>
+</view>
+<view wx:if="{{results.length === 0}}" class="empty">输入关键词搜索</view>

@@ -1,0 +1,9 @@
+<map
+  class="map"
+  latitude="{{latitude}}"
+  longitude="{{longitude}}"
+  markers="{{markers}}"
+  show-location
+  bindmarkertap="onMarkerTap"
+/>
+<view class="publish-btn" bindtap="goPublish">＋ 发布地点</view>

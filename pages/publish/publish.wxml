@@ -1,0 +1,29 @@
+<view class="form">
+  <input data-key="title" value="{{form.title}}" placeholder="标题/位置描述" bindinput="onInput" />
+
+  <picker data-key="category" range="{{category}}" bindchange="onPicker">
+    <view>品类：{{form.category}}</view>
+  </picker>
+
+  <picker data-key="timeSlot" range="{{timeSlot}}" bindchange="onPicker">
+    <view>时段：{{form.timeSlot}}</view>
+  </picker>
+
+  <input data-key="positionReq" value="{{form.positionReq}}" placeholder="地摊位置要求" bindinput="onInput" />
+  <input data-key="mgmtReq" value="{{form.mgmtReq}}" placeholder="城管/管理要求" bindinput="onInput" />
+
+  <picker data-key="feeType" range="{{feeType}}" bindchange="onPicker">
+    <view>费用类型：{{form.feeType}}</view>
+  </picker>
+  <input data-key="feeAmount" value="{{form.feeAmount}}" type="number" placeholder="费用金额（元，免费填0）" bindinput="onFeeAmount" />
+
+  <picker data-key="visibility" range="{{visibilityOptions}}" range-key="label" bindchange="onPicker">
+    <view>可见性：{{form.visibility}}</view>
+  </picker>
+
+  <view class="loc" bindtap="chooseLocation">
+    {{location ? '坐标已选：' + location.lat + ',' + location.lng : '点此在地图上选坐标'}}
+  </view>
+
+  <button class="submit" bindtap="submit">提交</button>
+</view>

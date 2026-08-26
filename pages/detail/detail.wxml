@@ -1,0 +1,23 @@
+<view wx:if="{{spot}}" class="container">
+  <view class="title">{{spot.cur.title}}</view>
+  <view class="row">品类：{{spot.cur.category}}</view>
+  <view class="row">时段：{{spot.cur.timeSlot}}</view>
+  <view class="row">位置要求：{{spot.cur.positionReq}}</view>
+  <view class="row">管理要求：{{spot.cur.mgmtReq}}</view>
+  <view class="row">费用：{{spot.cur.feeType}} {{spot.cur.feeAmount ? spot.cur.feeAmount + '元' : ''}}</view>
+  <view class="row">评分：{{spot.ratingAvg}}（{{spot.ratingCount}} 人评）</view>
+  <view wx:if="{{spot.hasPendingUpdate}}" class="pending-tip">⚠ 有修改待公布</view>
+
+  <view class="btns">
+    <button size="mini" bindtap="toggleFav">{{favorited ? '取消收藏' : '收藏'}}</button>
+    <button wx:if="{{isOwner}}" size="mini" bindtap="goEdit">编辑</button>
+    <button wx:if="{{isOwner}}" size="mini" bindtap="del">删除</button>
+  </view>
+
+  <view class="section-title">评价</view>
+  <view wx:if="{{reviews.length === 0}}" class="empty">暂无评价</view>
+  <view wx:for="{{reviews}}" wx:key="_id" class="review">
+    <view>评分 {{item.rating}} 分 · {{item.content}}</view>
+    <view wx:if="{{item.tags.length}}" class="tags">{{item.tags}}</view>
+  </view>
+</view>

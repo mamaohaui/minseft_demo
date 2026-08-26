@@ -1,0 +1,6 @@
+.search-bar { display: flex; padding: 20rpx; gap: 16rpx; }
+.search-bar input { flex: 1; border: 1rpx solid #ddd; border-radius: 8rpx; padding: 16rpx; }
+.item { padding: 24rpx; border-bottom: 1rpx solid #eee; }
+.t { font-size: 30rpx; }
+.s { color: #999; font-size: 24rpx; margin-top: 8rpx; }
+.empty { text-align: center; color: #999; padding: 80rpx 0; }

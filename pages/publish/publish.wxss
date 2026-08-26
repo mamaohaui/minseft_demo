@@ -1,0 +1,10 @@
+.form { padding: 24rpx; }
+.form input, .form picker view, .loc {
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  margin: 16rpx 0;
+  font-size: 28rpx;
+}
+.loc { color: #07c160; }
+.submit { background: #07c160; color: #fff; margin-top: 30rpx; }
