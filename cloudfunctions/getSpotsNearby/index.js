@@ -36,5 +36,11 @@ exports.main = async (event) => {
     .where({ creatorOpenid: OPENID, visibility: 'private' })
     .get()
 
-  return { ok: true, data: main.data.concat(priv.data) }
+  const all = main.data.concat(priv.data).map(s => {
+    if (s.current && s.current.location && s.current.location.coordinates) {
+      s.current.location = { lng: s.current.location.coordinates[0], lat: s.current.location.coordinates[1] }
+    }
+    return s
+  })
+  return { ok: true, data: all }
 }

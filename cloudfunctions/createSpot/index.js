@@ -15,7 +15,10 @@ exports.main = async (event) => {
     return { ok: false, code: 'INVALID', message: '可见性非法' }
   }
 
-  const content = { title, location, category, timeSlot, positionReq, mgmtReq, feeType, feeAmount }
+  const content = {
+    title, category, timeSlot, positionReq, mgmtReq, feeType, feeAmount,
+    location: db.Geo.Point(location.lng, location.lat),
+  }
 
   const spot = {
     creatorOpenid: OPENID,

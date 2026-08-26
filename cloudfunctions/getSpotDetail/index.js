@@ -17,5 +17,8 @@ exports.main = async (event) => {
     if (!admins.includes(OPENID)) return { ok: false, code: 'FORBIDDEN', message: '无权查看' }
   }
 
+  const toLngLat = (p) => p && p.coordinates ? { lng: p.coordinates[0], lat: p.coordinates[1] } : p
+  if (spot.current && spot.current.location) spot.current.location = toLngLat(spot.current.location)
+  if (spot.pending && spot.pending.location) spot.pending.location = toLngLat(spot.pending.location)
   return { ok: true, data: spot }
 }

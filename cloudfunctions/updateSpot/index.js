@@ -2,6 +2,7 @@
 const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
+const _ = db.command
 
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
@@ -15,16 +16,19 @@ exports.main = async (event) => {
     return { ok: false, code: 'NO_PERMISSION', message: '无权操作该地点' }
   }
 
-  const content = { title, location, category, timeSlot, positionReq, mgmtReq, feeType, feeAmount }
+  const content = {
+    title, category, timeSlot, positionReq, mgmtReq, feeType, feeAmount,
+    location: db.Geo.Point(location.lng, location.lat),
+  }
 
   if (spot.visibility === 'private') {
     await db.collection('spots').doc(spotId).update({
-      data: { current: content, updatedAt: db.serverDate() },
+      data: { current: _.set(content), updatedAt: db.serverDate() },
     })
   } else {
     // PR 式：current 不变，pending 存新版本，标注待公布
     await db.collection('spots').doc(spotId).update({
-      data: { pending: content, hasPendingUpdate: true, updatedAt: db.serverDate() },
+      data: { pending: _.set(content), hasPendingUpdate: true, updatedAt: db.serverDate() },
     })
   }
 

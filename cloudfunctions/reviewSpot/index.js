@@ -2,6 +2,7 @@
 const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
+const _ = db.command
 
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
@@ -24,9 +25,25 @@ exports.main = async (event) => {
   const isNew = !spot.current // current 为空 = 新建待审；否则是修改待审
 
   if (action === 'approve') {
+    const p = spot.pending
+    // pending.location 从库里读出是 GeoJSON {type:'Point',coordinates:[lng,lat]}，
+    // 必须用 db.Geo.Point 重新构造，直接 _.set(spot.pending) 会把 GeoPoint 写成普通对象导致写入失败
+    const loc = p.location || {}
+    const current = {
+      title: p.title,
+      category: p.category,
+      timeSlot: p.timeSlot,
+      positionReq: p.positionReq,
+      mgmtReq: p.mgmtReq,
+      feeType: p.feeType,
+      feeAmount: p.feeAmount,
+      location: loc.coordinates
+        ? db.Geo.Point(loc.coordinates[0], loc.coordinates[1])
+        : db.Geo.Point(loc.lng || loc.longitude, loc.lat || loc.latitude),
+    }
     await db.collection('spots').doc(spotId).update({
       data: {
-        current: spot.pending,
+        current: _.set(current),
         pending: null,
         status: 'approved',
         hasPendingUpdate: false,
