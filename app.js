@@ -1,19 +1,18 @@
 // app.js
 App({
   onLaunch() {
-    // 展示本地存储能力
-    const logs = wx.getStorageSync('logs') || []
-    logs.unshift(Date.now())
-    wx.setStorageSync('logs', logs)
-
-    // 登录
-    wx.login({
-      success: res => {
-        // 发送 res.code 到后台换取 openId, sessionKey, unionId
-      }
+    if (!wx.cloud) {
+      wx.showModal({
+        title: '提示',
+        content: '当前微信版本过低，无法使用云能力，请升级微信',
+        showCancel: false,
+      })
+      return
+    }
+    wx.cloud.init({
+      env: 'cloudbase-d7gkgs2uke727391c',
+      traceUser: true,
     })
   },
-  globalData: {
-    userInfo: null
-  }
+  globalData: {},
 })
