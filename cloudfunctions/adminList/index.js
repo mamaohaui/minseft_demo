@@ -14,5 +14,18 @@ exports.main = async () => {
     .orderBy('updatedAt', 'desc')
     .get()
 
-  return { ok: true, data: res.data }
+  // 坐标归一化：兼容 GeoJSON {coordinates} / GeoPoint {longitude,latitude} / 已是 {lng,lat}
+  const toLngLat = (p) => {
+    if (!p) return p
+    if (Array.isArray(p.coordinates) && p.coordinates.length >= 2) return { lng: p.coordinates[0], lat: p.coordinates[1] }
+    if (typeof p.longitude === 'number' && typeof p.latitude === 'number') return { lng: p.longitude, lat: p.latitude }
+    return p
+  }
+  const list = res.data.map(s => {
+    if (s.current && s.current.location) s.current.location = toLngLat(s.current.location)
+    if (s.pending && s.pending.location) s.pending.location = toLngLat(s.pending.location)
+    return s
+  })
+
+  return { ok: true, data: list }
 }

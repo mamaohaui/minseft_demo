@@ -11,8 +11,14 @@ exports.main = async () => {
     .limit(100)
     .get()
 
-  // location 是 GeoPoint，返回前转成 {lng,lat}，前端直接用
-  const toLngLat = (p) => p && p.coordinates ? { lng: p.coordinates[0], lat: p.coordinates[1] } : p
+  // location 读出来可能是 GeoJSON {coordinates:[lng,lat]}、GeoPoint {longitude,latitude}
+  // 或已是 {lng,lat}，统一归一化成 {lng,lat}，前端直接用
+  const toLngLat = (p) => {
+    if (!p) return p
+    if (Array.isArray(p.coordinates) && p.coordinates.length >= 2) return { lng: p.coordinates[0], lat: p.coordinates[1] }
+    if (typeof p.longitude === 'number' && typeof p.latitude === 'number') return { lng: p.longitude, lat: p.latitude }
+    return p
+  }
   const list = res.data.map(s => {
     if (s.current && s.current.location) s.current.location = toLngLat(s.current.location)
     if (s.pending && s.pending.location) s.pending.location = toLngLat(s.pending.location)

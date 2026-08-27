@@ -17,7 +17,13 @@ exports.main = async (event) => {
     if (!admins.includes(OPENID)) return { ok: false, code: 'FORBIDDEN', message: '无权查看' }
   }
 
-  const toLngLat = (p) => p && p.coordinates ? { lng: p.coordinates[0], lat: p.coordinates[1] } : p
+  // 坐标归一化：兼容 GeoJSON {coordinates} / GeoPoint {longitude,latitude} / 已是 {lng,lat}
+  const toLngLat = (p) => {
+    if (!p) return p
+    if (Array.isArray(p.coordinates) && p.coordinates.length >= 2) return { lng: p.coordinates[0], lat: p.coordinates[1] }
+    if (typeof p.longitude === 'number' && typeof p.latitude === 'number') return { lng: p.longitude, lat: p.latitude }
+    return p
+  }
   if (spot.current && spot.current.location) spot.current.location = toLngLat(spot.current.location)
   if (spot.pending && spot.pending.location) spot.pending.location = toLngLat(spot.pending.location)
 

@@ -14,7 +14,7 @@ Page({
     })
   },
 
-  // 派生状态标签与展示标题
+  // 派生状态标签与展示标题（坐标本地兜底归一化，双保险）
   decorateSpot(s) {
     let status, statusText
     if (s.status === 'rejected') { status = 'rejected'; statusText = '已驳回' }
@@ -22,6 +22,14 @@ Page({
     else if (s.hasPendingUpdate) { status = 'updating'; statusText = '修改待审' }
     else { status = 'approved'; statusText = '已公开' }
     const cur = s.current || s.pending || {}
+    if (cur.location) {
+      const p = cur.location
+      if (Array.isArray(p.coordinates) && p.coordinates.length >= 2) {
+        cur.location = { lng: p.coordinates[0], lat: p.coordinates[1] }
+      } else if (typeof p.latitude === 'number' && typeof p.longitude === 'number') {
+        cur.location = { lng: p.longitude, lat: p.latitude }
+      }
+    }
     return { ...s, _status: status, _statusText: statusText, _title: cur.title || '未命名地点' }
   },
 
