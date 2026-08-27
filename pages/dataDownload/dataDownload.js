@@ -17,6 +17,10 @@ Page({
     const r = await callCloud('listRegionPackages')
     let tree = []
     if (r.ok) {
+      // 首次进入时云端自动初始化公共数据库（播种基础点位），提示一下
+      if (r.seeded && (r.data || []).length) {
+        wx.showToast({ title: '公共数据库初始化完成', icon: 'none', duration: 2000 })
+      }
       const pmap = {}
       ;(r.data || []).forEach(it => {
         const key = `${it.province}|${it.city}|${it.district}`

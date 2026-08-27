@@ -41,15 +41,26 @@ const toLngLat = (p) => {
   return null
 }
 
+// 查询基础库点位（仅 source='base'，current 为空 = 未过审天然排除）
+const queryBase = () => db.collection('spots')
+  .where({ visibility: 'public', source: 'base' })
+  .limit(1000)
+  .get()
+  .catch(() => null)
+
 exports.main = async () => {
   // 仅统计基础库数据（source='base'，即程序收集整理的公共摆摊数据）
   // 用户自己发布的公开点位不属于"公共数据下载"范围（我的发布/收藏/关注另行展示）
-  // current 为空 = 未过审，天然排除；spots 集合查询 catch 兜底
-  const res = await db.collection('spots')
-    .where({ visibility: 'public', source: 'base' })
-    .limit(1000)
-    .get()
-    .catch(() => null)
+  let res = await queryBase()
+  let seeded = false
+
+  // 基础库为空：自动播种（免管理员手动导入——首次使用/从未导入过时自动完成）
+  // seedSpots 按标题幂等，重复触发不会产生重复数据
+  if (!res || !res.data || !res.data.length) {
+    await cloud.callFunction({ name: 'seedSpots', data: { autoseed: true } }).catch(() => null)
+    seeded = true
+    res = await queryBase()
+  }
 
   const counter = {}
   ;(((res && res.data) || []).forEach(s => {
@@ -64,5 +75,6 @@ exports.main = async () => {
     const [province, city, district] = key.split('|')
     return { province, city, district, count: counter[key] }
   })
-  return { ok: true, data }
+  // seeded = 本次执行触发了自动播种（前端可提示"数据库初始化完成"）
+  return { ok: true, data, seeded }
 }

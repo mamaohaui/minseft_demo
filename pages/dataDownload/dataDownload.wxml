@@ -6,7 +6,7 @@
   </view>
 
   <view wx:if="{{loading}}" class="loading">加载中…</view>
-  <view wx:elif="{{tree.length === 0}}" class="empty">暂无可下载的公共数据</view>
+  <view wx:elif="{{tree.length === 0}}" class="empty">公共数据库为空：请先在开发者工具中部署 seedSpots 云函数，再重新进入本页（将自动初始化基础数据）</view>
 
   <!-- 省 → 市 → 县三级层级（默认展开） -->
   <block wx:for="{{tree}}" wx:key="province" wx:for-item="prov" wx:for-index="pi">

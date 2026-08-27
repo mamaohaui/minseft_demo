@@ -83,9 +83,12 @@ const BASE_SPOTS = [
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
 
-  // 仅管理员可导入基础数据
+  // 自动播种模式：由 listRegionPackages 检测到基础库为空时触发（幂等，仅新增基础数据）
+  const autoseed = !!(event && event.autoseed)
+
+  // 手动导入仅管理员可用；自动播种免校验（数据本身是官方收集的公开信息）
   const admins = (process.env.adminOpenids || '').split(',').map(s => s.trim())
-  if (!admins.includes(OPENID)) {
+  if (!autoseed && !admins.includes(OPENID)) {
     return { ok: false, code: 'FORBIDDEN', message: '仅管理员可导入基础数据' }
   }
 
