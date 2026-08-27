@@ -8,8 +8,29 @@
   box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.06);
   margin-bottom: 8rpx;
 }
+.tip-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+.tip-head .tip-title { margin-bottom: 0; }
 .tip-title { font-size: 30rpx; font-weight: 600; color: #1c1c1e; margin-bottom: 12rpx; }
 .tip-text { font-size: 24rpx; color: #8e8e93; line-height: 1.6; }
+.tip-sub { margin-top: 10rpx; }
+
+/* 基础数据库「更新数据」按钮（iOS 蓝色胶囊） */
+.base-btn {
+  flex-shrink: 0;
+  font-size: 25rpx;
+  font-weight: 600;
+  color: #fff;
+  background: #007aff;
+  padding: 12rpx 30rpx;
+  border-radius: 22rpx;
+  box-shadow: 0 4rpx 14rpx rgba(0,122,255,0.3);
+}
+.base-btn-loading { background: #c7c7cc; box-shadow: none; }
 
 .loading, .empty {
   text-align: center;

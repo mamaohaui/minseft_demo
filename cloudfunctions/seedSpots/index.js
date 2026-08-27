@@ -81,16 +81,9 @@ const BASE_SPOTS = [
 ]
 
 exports.main = async (event) => {
-  const { OPENID } = cloud.getWXContext()
-
-  // 自动播种模式：由 listRegionPackages 检测到基础库为空时触发（幂等，仅新增基础数据）
-  const autoseed = !!(event && event.autoseed)
-
-  // 手动导入仅管理员可用；自动播种免校验（数据本身是官方收集的公开信息）
-  const admins = (process.env.adminOpenids || '').split(',').map(s => s.trim())
-  if (!autoseed && !admins.includes(OPENID)) {
-    return { ok: false, code: 'FORBIDDEN', message: '仅管理员可导入基础数据' }
-  }
+  // 公共基础数据库导入已并入「公共数据下载」页，不再做管理员校验：
+  // 数据是官方收集整理的公开信息，且幂等（只补缺失点位），任何用户触发都安全
+  const autoseed = !!(event && event.autoseed) // 保留标志仅用于日志区分来源
 
   // 幂等：查出基础库已有的标题，重复的跳过（分页拉全量，突破单次100条限制）
   let existTitles = []

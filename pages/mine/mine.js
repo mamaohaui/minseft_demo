@@ -1,7 +1,7 @@
 const { callCloud } = require('../../utils/cloud')
 
 Page({
-  data: { user: null, favorites: [], mySpots: [], offlineCount: 0, importing: false },
+  data: { user: null, favorites: [], mySpots: [], offlineCount: 0 },
 
   onShow() { this.load() },
 
@@ -32,25 +32,9 @@ Page({
     wx.navigateTo({ url: '/pages/favorites/favorites' })
   },
 
-  // 公共数据下载：按省/市/县下载离线数据包
+  // 公共数据下载：按省/市/县下载离线数据包（公共摆摊基础数据库的导入/更新也已并入该页）
   goDataDownload() {
     wx.navigateTo({ url: '/pages/dataDownload/dataDownload' })
-  },
-
-  // 导入公开摆摊基础数据库（seedSpots 幂等，重复执行只补新增；云端校验管理员身份）
-  async importBase() {
-    if (this.data.importing) return
-    this.setData({ importing: true })
-    const r = await callCloud('seedSpots')
-    this.setData({ importing: false })
-    if (r.ok) {
-      const d = r.data || {}
-      wx.showToast({
-        title: `新增${d.added || 0}条，已存在${d.skipped || 0}条`,
-        icon: 'none',
-        duration: 2500,
-      })
-    }
   },
 
   goAdmin() {

@@ -8,9 +8,35 @@ Page({
   data: {
     tree: [],       // [{province, expanded, cities: [{city, expanded, total, districts: [{district, count, key, province, city, downloaded}]}]}]
     loading: true,
+    updating: false, // 基础数据库更新中
   },
 
   onShow() { this.load() },
+
+  // 更新公共摆摊基础数据库（原管理员导入功能并入此处；seedSpots 幂等，只补缺失点位）
+  // 提示用户：已下载的数据包不会自动刷新，新数据需重新下载对应区域
+  async updateBase() {
+    if (this.data.updating) return
+    this.setData({ updating: true })
+    const r = await callCloud('seedSpots')
+    this.setData({ updating: false })
+    if (!r.ok) {
+      wx.showToast({ title: r.message || '更新失败，请重试', icon: 'none' })
+      return
+    }
+    const d = r.data || {}
+    if (d.added > 0) {
+      wx.showModal({
+        title: '基础数据库已更新',
+        content: `本次新增 ${d.added} 个官方点位（另有 ${d.skipped} 个已存在）。已下载的数据包不会自动刷新，如需查看新点位请重新下载对应区域。`,
+        confirmText: '好的',
+        showCancel: false,
+        success: () => this.load(),
+      })
+    } else {
+      wx.showToast({ title: '已是最新，共 ' + (d.total || 0) + ' 个官方点位', icon: 'none' })
+    }
+  },
 
   async load() {
     this.setData({ loading: true })
