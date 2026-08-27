@@ -30,4 +30,20 @@ const VISIBILITY = [
   { value: 'private', label: '私人（仅自己可见，免审核）' },
 ]
 
-module.exports = { CATEGORIES, TIME_SLOTS, FEE_TYPES, SPOT_TYPES, VISIBILITY, REGIONS }
+// 坐标 → 区域：就近归入成都区县（25km 内），超出归"其他地区"
+// 与云函数 listRegionPackages / getRegionSpots 的划分逻辑保持一致（不含"成都市中心"占位）
+const regionOf = (lng, lat) => {
+  const districts = REGIONS.filter(r => r.name !== '成都市中心')
+  let best = null
+  let bestD = Infinity
+  for (const d of districts) {
+    const dx = (lng - d.lng) * 95.5 // 北纬30.6° 经度每度约 95.5km
+    const dy = (lat - d.lat) * 111
+    const dist = Math.sqrt(dx * dx + dy * dy)
+    if (dist < bestD) { bestD = dist; best = d }
+  }
+  if (best && bestD <= 25) return { province: '四川省', city: '成都市', district: best.name }
+  return { province: '其他地区', city: '其他', district: '其他' }
+}
+
+module.exports = { CATEGORIES, TIME_SLOTS, FEE_TYPES, SPOT_TYPES, VISIBILITY, REGIONS, regionOf }

@@ -1,7 +1,7 @@
 const { callCloud } = require('../../utils/cloud')
 
 Page({
-  data: { user: null, favorites: [], mySpots: [] },
+  data: { user: null, favorites: [], mySpots: [], offlineCount: 0 },
 
   onShow() { this.load() },
 
@@ -12,10 +12,13 @@ Page({
       callCloud('getFavorites'),
       callCloud('getMySpots'),
     ])
+    // 已下载离线数据包数量（本地 storage，无需云端请求）
+    const pkgs = wx.getStorageSync('offlineRegionPackages') || {}
     this.setData({
       user: u.ok ? u.data : this.data.user,
       favorites: f.ok ? f.data : this.data.favorites,
       mySpots: m.ok ? m.data : this.data.mySpots,
+      offlineCount: Object.keys(pkgs).length,
     })
   },
 
@@ -27,6 +30,11 @@ Page({
   // 我的收藏：独立管理页（查看/取消收藏）
   goFavorites() {
     wx.navigateTo({ url: '/pages/favorites/favorites' })
+  },
+
+  // 公共数据下载：按省/市/县下载离线数据包
+  goDataDownload() {
+    wx.navigateTo({ url: '/pages/dataDownload/dataDownload' })
   },
 
   goAdmin() {

@@ -9,7 +9,8 @@
     "pages/publish/publish",
     "pages/admin/admin",
     "pages/mySpots/mySpots",
-    "pages/favorites/favorites"
+    "pages/favorites/favorites",
+    "pages/dataDownload/dataDownload"
   ],
   "window": {
     "navigationBarTextStyle": "black",

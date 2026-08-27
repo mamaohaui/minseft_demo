@@ -33,6 +33,14 @@
       </view>
       <text class="arrow">›</text>
     </view>
+    <view class="entry-row row-divider" hover-class="row-pressed" hover-stay-time="80" bindtap="goDataDownload">
+      <view class="entry-left">
+        <view class="entry-name">公共数据下载</view>
+        <view class="entry-sub" wx:if="{{offlineCount}}">已下载 {{offlineCount}} 个区域数据包</view>
+        <view class="entry-sub" wx:else>按省 / 市 / 县下载公共摊点数据包</view>
+      </view>
+      <text class="arrow">›</text>
+    </view>
   </view>
 
   <!-- 管理员审核：单独分组，放在下面（仅管理员可见） -->

@@ -1,8 +1,9 @@
 const { callCloud } = require('../../utils/cloud')
-const { REGIONS } = require('../../utils/constants')
+const { REGIONS, regionOf } = require('../../utils/constants')
 
 const FOCUS_MARKER_ID = 999999 // 「查看」目标标志固定 id
 const DEFAULT_REGION = REGIONS[0] // 定位失败时的兜底：成都市中心
+const PKG_KEY = 'offlineRegionPackages' // 离线数据包 storage 键（与公共数据下载页一致）
 
 // 坐标归一化兜底：兼容 GeoJSON {coordinates} / GeoPoint {longitude,latitude} / 已是 {lng,lat}
 const toLatLng = (loc) => {
@@ -26,6 +27,15 @@ const normalizeSpot = (s) => {
   return s
 }
 
+// 点位 → 所属区域键（province|city|district），结果缓存到点位对象上
+const regionKeyOf = (spot) => {
+  if (!spot._regionKey) {
+    const r = regionOf(spot.current.location.lng, spot.current.location.lat)
+    spot._regionKey = `${r.province}|${r.city}|${r.district}`
+  }
+  return spot._regionKey
+}
+
 Page({
   data: {
     latitude: DEFAULT_REGION.lat,   // 地图渲染中心（仅定位/选地区/回到定位时更新）
@@ -44,11 +54,28 @@ Page({
   },
 
   onLoad() {
+    this.loadOffline()
     this.getLocation()
+  },
+
+  // 读取已下载的离线数据包：合并进候选池，并形成"已下载区域键"集合（公共摊点显示门控）
+  loadOffline() {
+    const pkgs = wx.getStorageSync(PKG_KEY) || {}
+    this._offlineSpots = []
+    this._offlineKeys = {}
+    Object.keys(pkgs).forEach(k => {
+      this._offlineKeys[k] = true
+      ;((pkgs[k] && pkgs[k].spots) || []).forEach(s => {
+        const n = normalizeSpot(s)
+        if (n) this._offlineSpots.push(n)
+      })
+    })
   },
 
   // 「我的发布/管理员审核-查看」跳转过来：globalData 传入目标点，居中并强制显示标志
   onShow() {
+    // 数据包可能刚下载/删除，先重读本地（收藏+关注随后静默刷新并重建 markers）
+    this.loadOffline()
     // 每次回地图页静默刷新收藏+关注（详情页收藏/关注/取关后图层即时生效）
     this.refreshFavs()
     this.refreshFollowed()
@@ -165,16 +192,19 @@ Page({
     const L = this.data.layers
     const favIds = this._favIds || []
     const followeeIds = this._followeeIds || []
-    // 候选池合并去重：附近点位 + 我的收藏 + 关注的人发布的点位（后写入的优先级高）
+    const offlineKeys = this._offlineKeys || {}
+    // 候选池合并去重：附近点位 + 离线数据包 + 我的收藏 + 关注的人发布的点位（后写入的优先级高）
     const cand = {}
     ;(this._allSpots || []).forEach(s => { cand[s._id] = s })
+    ;(this._offlineSpots || []).forEach(s => { cand[s._id] = s })
     ;(this._favSpots || []).forEach(s => { cand[s._id] = s })
     ;(this._followedSpots || []).forEach(s => { cand[s._id] = s })
     // 按优先级归类：我的私有 > 关注分享（收藏 / 关注的人发布）> 公共摊点
+    // 公共摊点仅在所属区域的数据包已下载时显示（未下载区域的公共点位不显示）
     let spots = Object.values(cand).filter(s => {
       if (s.visibility === 'private') return L.private
       if (favIds.includes(s._id) || followeeIds.includes(s.creatorOpenid)) return L.followed
-      return L.public
+      return L.public && !!offlineKeys[regionKeyOf(s)]
     })
     const f = focus || this._focusSpot
     if (f) spots = spots.filter(s => s._id !== f._id)

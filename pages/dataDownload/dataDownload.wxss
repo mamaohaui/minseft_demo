@@ -1,0 +1,77 @@
+.page { padding: 24rpx 32rpx 48rpx; }
+
+/* ===== 说明卡 ===== */
+.tip-card {
+  background: #fff;
+  border-radius: 28rpx;
+  padding: 32rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.06);
+  margin-bottom: 8rpx;
+}
+.tip-title { font-size: 30rpx; font-weight: 600; color: #1c1c1e; margin-bottom: 12rpx; }
+.tip-text { font-size: 24rpx; color: #8e8e93; line-height: 1.6; }
+
+.loading, .empty {
+  text-align: center;
+  color: #8e8e93;
+  font-size: 27rpx;
+  padding: 120rpx 0;
+}
+
+/* ===== 省级节标题 ===== */
+.section-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #8e8e93;
+  letter-spacing: 2rpx;
+  margin: 36rpx 8rpx 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.title-pressed { opacity: 0.6; }
+.expand-icon { color: #c7c7cc; font-size: 28rpx; }
+
+/* ===== 分组卡片（iOS inset grouped list） ===== */
+.group-card {
+  background: #fff;
+  border-radius: 28rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+.row-divider { border-top: 1rpx solid rgba(60,60,67,0.12); }
+
+/* 市级行 */
+.city-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28rpx 32rpx;
+}
+.city-name { font-size: 30rpx; font-weight: 500; color: #1c1c1e; }
+
+/* 县级行：信息 + 下载/删除按钮 */
+.dist-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 32rpx;
+}
+.dist-info { display: flex; flex-direction: column; gap: 6rpx; }
+.dist-name { font-size: 29rpx; color: #1c1c1e; }
+.dist-sub { font-size: 23rpx; color: #8e8e93; }
+
+.dl-btn {
+  font-size: 26rpx;
+  color: #fff;
+  background: #007aff;
+  border-radius: 999rpx;
+  padding: 12rpx 36rpx;
+}
+.dl-remove {
+  color: #ff3b30;
+  background: rgba(255,59,48,0.1);
+}
+.btn-pressed { opacity: 0.6; }
+
+.row-pressed { background: rgba(60,60,67,0.06); }

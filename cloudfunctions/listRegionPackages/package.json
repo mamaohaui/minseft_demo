@@ -1,0 +1,9 @@
+{
+  "name": "listRegionPackages",
+  "version": "1.0.0",
+  "description": "公共摊点离线数据包目录（按省/市/县统计）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -74,5 +74,5 @@
 </view>
 
 <view wx:if="{{loaded && markers.length === 0}}" class="empty-tip">
-  当前地区暂无摊点，可换地区或发布第一个
+  当前地区暂无摊点。公共摊点需先下载数据包：我的 → 公共数据下载
 </view>
