@@ -1,7 +1,41 @@
-.search-bar { display: flex; padding: 20rpx; gap: 16rpx; }
+.search-bar { display: flex; padding: 20rpx; gap: 16rpx; background: #fff; }
 .search-bar input { flex: 1; border: 1rpx solid #ddd; border-radius: 8rpx; padding: 16rpx; }
-.item { padding: 24rpx; border-bottom: 1rpx solid #eee; }
-.t { font-size: 30rpx; }
+
+/* 筛选区 */
+.filter-block {
+  background: #fff;
+  margin-top: 2rpx;
+  padding: 8rpx 20rpx 20rpx;
+}
+.filter-row { margin-top: 16rpx; }
+.filter-label { font-size: 24rpx; color: #999; margin-bottom: 12rpx; }
+.chips { display: flex; flex-wrap: wrap; gap: 14rpx; }
+.chip {
+  font-size: 24rpx;
+  color: #555;
+  background: #f5f5f5;
+  border: 1rpx solid #eee;
+  border-radius: 28rpx;
+  padding: 8rpx 26rpx;
+}
+.chip-on {
+  color: #07c160;
+  background: #e8f7ef;
+  border-color: #07c160;
+  font-weight: 600;
+}
+.creator-input {
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 14rpx 16rpx;
+  font-size: 26rpx;
+}
+.reset-line { margin-top: 20rpx; text-align: center; font-size: 24rpx; color: #999; }
+
+/* 结果列表 */
+.item { padding: 24rpx; border-bottom: 1rpx solid #eee; background: #fff; }
+.t { font-size: 30rpx; font-weight: 600; }
 .s { color: #999; font-size: 24rpx; margin-top: 8rpx; }
+.creator { color: #07c160; font-size: 24rpx; margin-top: 8rpx; }
 .empty { text-align: center; color: #999; padding: 80rpx 0; }
 .hint { text-align: center; color: #999; font-size: 24rpx; padding: 16rpx 0; }

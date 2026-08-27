@@ -21,8 +21,15 @@ exports.main = async (event) => {
     location: db.Geo.Point(location.lng, location.lat),
   }
 
+  // 同步刷新发布者昵称（改名后重新提交会更新，保证搜索一致）
+  let creatorName = ''
+  try {
+    const u = await db.collection('users').doc(OPENID).get()
+    creatorName = (u.data && u.data.nickname) || ''
+  } catch (e) {}
+
   if (spot.visibility === 'private') {
-    const data = { current: _.set(content), updatedAt: db.serverDate() }
+    const data = { current: _.set(content), creatorName, updatedAt: db.serverDate() }
     // 被驳回后改为私人：直改 current 并重置状态，清空残留的驳回标记
     if (spot.status === 'rejected') {
       data.status = 'approved'
@@ -33,7 +40,7 @@ exports.main = async (event) => {
     await db.collection('spots').doc(spotId).update({ data })
   } else {
     // PR 式：current 不变，pending 存新版本，标注待公布
-    const data = { pending: _.set(content), hasPendingUpdate: true, updatedAt: db.serverDate() }
+    const data = { pending: _.set(content), creatorName, hasPendingUpdate: true, updatedAt: db.serverDate() }
     // 被驳回后重新提交：重置为待审核并清空驳回原因，重新进入审核队列
     if (spot.status === 'rejected') {
       data.status = 'pending'

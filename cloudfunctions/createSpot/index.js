@@ -20,8 +20,16 @@ exports.main = async (event) => {
     location: db.Geo.Point(location.lng, location.lat),
   }
 
+  // 发布者昵称：服务端从用户档案读取（不信任客户端传值），供搜索"按发布者"使用
+  let creatorName = ''
+  try {
+    const u = await db.collection('users').doc(OPENID).get()
+    creatorName = (u.data && u.data.nickname) || ''
+  } catch (e) {}
+
   const spot = {
     creatorOpenid: OPENID,
+    creatorName,
     visibility,
     ratingAvg: 0,
     ratingCount: 0,

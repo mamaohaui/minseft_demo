@@ -1,12 +1,16 @@
 <view class="page">
-  <!-- 用户卡 -->
-  <view class="user-card">
+  <!-- 用户卡：点击设置发布者昵称 -->
+  <view class="user-card" bindtap="editNickname">
     <view class="avatar">摊</view>
     <view class="user-info">
-      <view class="user-name">摆摊摊友</view>
+      <view class="user-name">
+        {{user && user.nickname ? user.nickname : '摆摊摊友'}}
+        <text class="name-edit">✎ 设置昵称</text>
+      </view>
       <view class="user-role {{user && user.isAdmin ? 'role-admin' : ''}}">
         {{user ? (user.isAdmin ? '管理员' : '普通用户') : '身份加载中…'}}
       </view>
+      <view class="user-hint">昵称用于发布展示与被搜索</view>
     </view>
   </view>
 

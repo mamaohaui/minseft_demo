@@ -1,11 +1,45 @@
 <view class="search-bar">
-  <input value="{{keyword}}" placeholder="搜索品类/名称，如「小吃」" bindinput="onInput" confirm-type="search" bindconfirm="doSearch" />
+  <input value="{{keyword}}" placeholder="搜索名称 / 品类关键词" bindinput="onInput" confirm-type="search" bindconfirm="doSearch" />
   <button size="mini" bindtap="doSearch">搜索</button>
 </view>
+
+<!-- 筛选区 -->
+<view class="filter-block">
+  <view class="filter-row">
+    <view class="filter-label">品类</view>
+    <view class="chips">
+      <view wx:for="{{categories}}" wx:key="*this"
+            class="chip {{category === item ? 'chip-on' : ''}}"
+            data-value="{{item}}" bindtap="toggleCategory">{{item}}</view>
+    </view>
+  </view>
+
+  <view class="filter-row">
+    <view class="filter-label">地点类型</view>
+    <view class="chips">
+      <view wx:for="{{spotTypes}}" wx:key="*this"
+            class="chip {{spotType === item ? 'chip-on' : ''}}"
+            data-value="{{item}}" bindtap="toggleSpotType">{{item}}</view>
+    </view>
+  </view>
+
+  <view class="filter-row">
+    <view class="filter-label">发布者</view>
+    <input class="creator-input" value="{{creator}}"
+           placeholder="输入发布者昵称，搜 TA 公开发的地点"
+           bindinput="onCreatorInput" confirm-type="search" bindconfirm="doSearch" />
+  </view>
+
+  <view wx:if="{{hasCond}}" class="reset-line" bindtap="resetAll">清空筛选 ✕</view>
+</view>
+
 <view wx:if="{{searching}}" class="hint">搜索中…</view>
+
 <view wx:for="{{results}}" wx:key="_id" class="item" data-id="{{item._id}}" bindtap="goDetail">
   <view class="t">{{item.current.title}}</view>
-  <view class="s">{{item.current.category}} · {{item.current.timeSlot}}</view>
+  <view class="s">{{item.current.category}} · {{item.current.timeSlot}} · {{item.current.feeType}}</view>
+  <view class="creator">发布者：{{item.creatorName || '匿名摊友'}}</view>
 </view>
-<view wx:if="{{!searching && results.length === 0 && searched}}" class="empty">没有找到「{{keyword}}」相关的摆摊点</view>
-<view wx:if="{{!searched}}" class="empty">输入关键词搜索</view>
+
+<view wx:if="{{!searching && results.length === 0 && searched}}" class="empty">没有符合条件的摆摊点，换个条件试试</view>
+<view wx:if="{{!searched}}" class="empty">输入关键词，或选择品类 / 地点类型 / 发布者</view>
