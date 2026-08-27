@@ -1,5 +1,6 @@
 // 公共数据下载页：像离线地图包一样按省/市/县下载公共摊点数据
 // 下载后地图才显示对应区域的公共摊点；未下载区域的公共摊点不显示
+// 「更新数据」已整合进下载动作：每次下载自动同步官方最新基础点位，无需单独更新
 const { callCloud } = require('../../utils/cloud')
 
 const PKG_KEY = 'offlineRegionPackages'
@@ -8,39 +9,9 @@ Page({
   data: {
     tree: [],       // [{province, expanded, cities: [{city, expanded, total, districts: [{district, count, key, province, city, downloaded}]}]}]
     loading: true,
-    updating: false, // 基础数据库更新中
   },
 
   onShow() { this.load() },
-
-  // 更新公共摆摊基础数据库（原管理员导入功能并入此处；seedSpots 幂等，只补缺失点位）
-  // 提示用户：已下载的数据包不会自动刷新，新数据需重新下载对应区域
-  async updateBase() {
-    if (this.data.updating) return
-    this.setData({ updating: true })
-    const r = await callCloud('seedSpots')
-    this.setData({ updating: false })
-    if (!r.ok) {
-      // 区分具体失败原因：未部署 / 云端旧版本仍校验管理员 / 其他
-      const tip = r.code === 'NOT_DEPLOYED' ? '云函数 seedSpots 未部署，请先上传部署'
-        : r.code === 'FORBIDDEN' ? '云端 seedSpots 是旧版本（仍校验管理员），请重新部署该云函数'
-        : (r.message || '更新失败，请重试')
-      wx.showToast({ title: tip, icon: 'none', duration: 3000 })
-      return
-    }
-    const d = r.data || {}
-    if (d.added > 0) {
-      wx.showModal({
-        title: '基础数据库已更新',
-        content: `本次新增 ${d.added} 个官方点位（另有 ${d.skipped} 个已存在）。已下载的数据包不会自动刷新，如需查看新点位请重新下载对应区域。`,
-        confirmText: '好的',
-        showCancel: false,
-        success: () => this.load(),
-      })
-    } else {
-      wx.showToast({ title: '已是最新，共 ' + (d.total || 0) + ' 个官方点位', icon: 'none' })
-    }
-  },
 
   async load() {
     this.setData({ loading: true })
@@ -132,69 +103,92 @@ Page({
     })
   },
 
-  // 自动修复 + 诊断：播种基础库后重试拉取；仍失败时逐项探测云端状态
-  // 返回 {ok:true, retry} 或 {ok:false, lines:[诊断结论], ...}
-  // 典型故障（云端云函数版本不一致）：
-  //   seedSpots 旧版仍校验管理员 → FORBIDDEN，播种被拒，基础库一直为空
-  //   seedSpots 未部署 → NOT_DEPLOYED
-  //   基础库有数据但 getRegionSpots 拉不到 → 下载接口版本问题
-  async healAndDiagnose(city) {
-    // 1) 触发播种（新版 seedSpots 无管理员校验、幂等，直接当修复动作）
-    const seed = await callCloud('seedSpots', { autoseed: true }, { silent: true })
-    // 2) 播种后重试拉取
-    const retry = await this.fetchCitySpots(city)
-    if (retry.total) return { ok: true, retry, seed }
+  // 拉取公共点位（下载 = 更新 + 拉取，一步到位）
+  // ① 首选 seedSpots({withData})：新版云函数播种补齐缺失点位后直接返回全部基础库点位
+  //    —— 每次下载都自动同步官方最新数据，无需单独「更新数据」
+  // ② 云端 seedSpots 为旧版（不返回 spots）时，退回 getRegionSpots 拉取：
+  //    先整市一次拉取，再降级逐区县拉取，全部下级区域照常落地
+  // 返回 { groups: {区县: [点位]}, total, seed }
+  async fetchCitySpots(city) {
+    let groups = {}
+    let total = 0
 
-    // 3) 仍拉不到：逐项探测，生成可执行的诊断结论
+    // ① 更新 + 拉取一体化：seedSpots 新版直接返回全部基础库点位（含 province/city/district）
+    const seed = await callCloud('seedSpots', { withData: true }, { silent: true })
+    const seedSpots = seed.ok && seed.data && Array.isArray(seed.data.spots) ? seed.data.spots : null
+    if (seedSpots && seedSpots.length) {
+      seedSpots.forEach(s => {
+        if (s.province !== city.province || s.city !== city.city) return
+        const d = s.district || '其他'
+        ;(groups[d] = groups[d] || []).push(s)
+        total++
+      })
+      if (total) return { groups, total, seed }
+    }
+
+    // ② 退回 getRegionSpots（兼容云端旧版部署组合）
+    const r = await callCloud('getRegionSpots', { province: city.province, city: city.city }, { silent: true })
+    if (r.ok && (r.data || []).length) {
+      total = r.data.length
+      r.data.forEach(s => {
+        const d = s.district || '其他'
+        ;(groups[d] = groups[d] || []).push(s)
+      })
+    } else {
+      // 整市接口不可用（旧版 / 未部署）：逐区县拉取
+      for (const d of city.districts) {
+        const rd = await callCloud(
+          'getRegionSpots',
+          { province: city.province, city: city.city, district: d.district },
+          { silent: true },
+        )
+        if (rd.ok && (rd.data || []).length) {
+          total += rd.data.length
+          groups[d.district] = rd.data
+        }
+      }
+    }
+    return { groups, total, seed }
+  },
+
+  // 下载失败时的诊断：明确指出云端哪个云函数版本有问题、该部署哪个
+  // （seed 为下载时 seedSpots 的调用结果，直接复用，不重复请求云端）
+  async diagnose(city, seed) {
+    const lines = []
+    let onlyDeploy = []
     const list = await callCloud('listRegionPackages', {}, { silent: true })
     const baseTotal = list.ok
       ? (list.data || []).reduce((s, d) => s + (d.count || 0), 0)
       : -1
-    const lines = []
-    const seedCode = seed && seed.code
-    if (!seed || !seed.ok) {
-      if (seedCode === 'NOT_DEPLOYED') {
-        lines.push('云函数 seedSpots 未部署')
-      } else if (seedCode === 'FORBIDDEN') {
-        lines.push('云端 seedSpots 是旧版本（仍校验管理员身份，导入被拒绝）')
-      } else {
-        lines.push('基础数据导入失败（' + ((seed && seed.message) || '网络异常') + '）')
-      }
-    } else {
-      const d = seed.data || {}
-      lines.push(`基础数据导入正常：共 ${d.total || 0} 个点位（本次新增 ${d.added || 0}）`)
-    }
-    if (baseTotal > 0) {
-      lines.push(`云端基础库已有 ${baseTotal} 个点位，但下载接口拉取结果为 0（getRegionSpots 版本过旧）`)
-    } else if (baseTotal === 0) {
-      lines.push('云端基础库为空（导入未生效）')
-    }
-    return { ok: false, retry, seed, baseTotal, lines }
-  },
 
-  // 诊断报告弹窗：明确告诉用户云端哪个云函数有问题、该怎么做
-  showDiagnosis(lines, rep) {
-    // 根据实际故障精简提示：基础库已有数据且 seed 正常时，只需部署 getRegionSpots
-    const seedOk = rep && rep.seed && rep.seed.ok
-    const baseHasData = rep && rep.baseTotal > 0
-    let fixLines = []
-    if (!seedOk) {
-      fixLines.push('① seedSpots（基础数据导入）')
-      fixLines.push('② getRegionSpots（区域数据拉取）')
-      fixLines.push('③ listRegionPackages（目录统计）')
-    } else if (baseHasData) {
-      fixLines.push('① getRegionSpots（区域数据拉取）')
-    } else {
-      fixLines.push('① seedSpots（基础数据导入）')
-      fixLines.push('② getRegionSpots（区域数据拉取）')
-      fixLines.push('③ listRegionPackages（目录统计）')
+    if (!seed || !seed.ok) {
+      if (seed && seed.code === 'NOT_DEPLOYED') {
+        lines.push('云函数 seedSpots 未部署')
+        onlyDeploy.push('① seedSpots（基础数据更新+下载，最关键）')
+      } else if (seed && seed.code === 'FORBIDDEN') {
+        lines.push('云端 seedSpots 是旧版本（仍校验管理员身份，导入被拒绝）')
+        onlyDeploy.push('① seedSpots（基础数据更新+下载，最关键）')
+      } else {
+        lines.push('基础数据同步失败（网络异常）')
+      }
+    } else if (!(seed.data && Array.isArray(seed.data.spots))) {
+      // seedSpots 成功但没有返回点位数据：云端是「无管理员校验」的中间版本
+      lines.push(`云端 seedSpots 为旧版本（不能直接返回下载数据；基础库共 ${baseTotal > 0 ? baseTotal : ((seed.data && seed.data.total) || 0)} 个点位）`)
+      onlyDeploy.push('① seedSpots（基础数据更新+下载，最关键）')
     }
+
+    if (!onlyDeploy.length && baseTotal > 0) {
+      lines.push(`云端基础库已有 ${baseTotal} 个点位，但下载接口均未返回数据（getRegionSpots 版本过旧）`)
+      onlyDeploy.push('① getRegionSpots（区域数据拉取）')
+    }
+    if (!lines.length) lines.push('云端公共数据为空')
 
     wx.showModal({
       title: '下载失败 · 诊断结果',
       content: lines.join('；') +
         '。\n\n解决办法：在微信开发者工具左侧展开 cloudfunctions 目录，右键以下云函数选择「上传并部署：云端安装依赖」——\n' +
-        fixLines.join('\n') + '\n部署完成后回到本页重试即可。',
+        (onlyDeploy.length ? onlyDeploy.join('\n') : '① seedSpots（基础数据更新+下载）\n② getRegionSpots（区域数据拉取）') +
+        '\n部署完成后回到本页重试即可。',
       confirmText: '我知道了',
       showCancel: false,
     })
@@ -205,33 +199,15 @@ Page({
     const { key, province, city, district } = e.currentTarget.dataset
     this.confirmDownload(
       '下载数据包',
-      `确定下载「${district}」的公共摊点数据吗？下载后地图公共图层将显示该区域摊点。`,
+      `确定下载「${district}」的公共摊点数据吗？将自动同步官方最新数据，下载后地图公共图层显示该区域摊点。`,
       async () => {
         wx.showLoading({ title: '下载中…', mask: true })
-        // 静默调用：失败提示统一由本页处理（区分未部署 / 网络异常 / 云端数据为空）
-        const r = await callCloud('getRegionSpots', { province, city, district }, { silent: true })
-        let spots = r.ok ? (r.data || []) : []
+        const pseudoCity = { province, city, districts: [{ district }] }
+        const { groups, seed } = await this.fetchCitySpots(pseudoCity)
+        const spots = groups[district] || []
+        wx.hideLoading()
         if (!spots.length) {
-          // 拉不到数据：自动修复（播种基础库后重试），仍失败则弹出诊断报告
-          wx.showLoading({ title: '自动修复中…', mask: true })
-          const pseudoCity = { province, city, districts: [{ district }] }
-          const rep = await this.healAndDiagnose(pseudoCity)
-          wx.hideLoading()
-          if (rep.ok) {
-            spots = rep.retry.groups[district] || []
-          } else {
-            if (r.code === 'NOT_DEPLOYED' && rep.seed && rep.seed.code === 'NOT_DEPLOYED') {
-              wx.showToast({ title: '云函数 getRegionSpots / seedSpots 未部署', icon: 'none', duration: 3000 })
-            } else {
-              this.showDiagnosis(rep.lines, rep)
-            }
-            return
-          }
-        } else {
-          wx.hideLoading()
-        }
-        if (!spots.length) {
-          wx.showToast({ title: '该区域暂无公共数据', icon: 'none' })
+          await this.diagnose(pseudoCity, seed)
           return
         }
         const pkgs = wx.getStorageSync(PKG_KEY) || {}
@@ -248,46 +224,7 @@ Page({
     )
   },
 
-  // 拉取整市公共点位：优先一次调用整市拉取（新版云函数）；
-  // 调用失败（旧版云函数不认省+市 / 网络异常 / 未部署）或拉到 0 条时，
-  // 自动降级为逐区县拉取，全部下级区域照常落地
-  async fetchCitySpots(city) {
-    let groups = {}
-    let total = 0
-    let lastCode = ''
-
-    const r = await callCloud('getRegionSpots', { province: city.province, city: city.city }, { silent: true })
-    if (r.ok) {
-      total = (r.data || []).length
-      ;(r.data || []).forEach(s => {
-        const d = s.district || '其他'
-        ;(groups[d] = groups[d] || []).push(s)
-      })
-    } else {
-      lastCode = r.code || '' // INVALID=旧版云函数 / NETWORK / NOT_DEPLOYED
-    }
-
-    if (!Object.keys(groups).length) {
-      for (const d of city.districts) {
-        const rd = await callCloud(
-          'getRegionSpots',
-          { province: city.province, city: city.city, district: d.district },
-          { silent: true },
-        )
-        if (rd.ok) {
-          lastCode = ''
-          total += (rd.data || []).length
-          groups[d.district] = rd.data || []
-        } else {
-          lastCode = rd.code || lastCode
-        }
-      }
-    }
-    return { groups, total, lastCode }
-  },
-
-  // 整市一键下载：全部下级区县的数据包都下载
-  // 三重容错：①整市一次拉取 ②失败/拉空降级逐区县 ③仍为空自动初始化基础库后重试
+  // 整市一键下载：全部下级区县的数据包都下载（自动同步官方最新数据）
   downloadCity(e) {
     const { pi, ci } = e.currentTarget.dataset
     const city = this.data.tree[pi].cities[ci]
@@ -298,35 +235,13 @@ Page({
     }
     this.confirmDownload(
       '下载整市数据',
-      `确定下载「${city.city}」全部 ${city.districts.length} 个区县（共 ${city.total} 个摊点）的数据包吗？`,
+      `确定下载「${city.city}」全部 ${city.districts.length} 个区县（共 ${city.total} 个摊点）的数据包吗？将自动同步官方最新数据。`,
       async () => {
         wx.showLoading({ title: '下载中…', mask: true })
-        let { groups, total, lastCode } = await this.fetchCitySpots(city)
-
-        // 自愈：一个点位都没拿到（或报未部署）→ 播种基础库后重试；
-        // 仍失败则弹出诊断报告（指明云端哪个云函数版本有问题、该部署哪个）
-        if (!total) {
-          const rep = await this.healAndDiagnose(city)
-          if (rep.ok) {
-            groups = rep.retry.groups
-            total = rep.retry.total
-            lastCode = rep.retry.lastCode
-          } else {
-            wx.hideLoading()
-            if (lastCode === 'NOT_DEPLOYED' && rep.seed && rep.seed.code === 'NOT_DEPLOYED') {
-              wx.showToast({ title: '云函数 getRegionSpots / seedSpots 未部署', icon: 'none', duration: 3000 })
-            } else if (lastCode === 'NETWORK') {
-              wx.showToast({ title: '网络异常，请稍后重试', icon: 'none' })
-            } else {
-              this.showDiagnosis(rep.lines, rep)
-            }
-            return
-          }
-        }
-
+        const { groups, total, seed } = await this.fetchCitySpots(city)
         wx.hideLoading()
         if (!total) {
-          wx.showToast({ title: '云端公共数据为空', icon: 'none', duration: 2500 })
+          await this.diagnose(city, seed)
           return
         }
         // 按区县逐包写入本地（与单个下载的存储结构一致）
@@ -341,6 +256,13 @@ Page({
         })
         wx.setStorageSync(PKG_KEY, pkgs)
         this.refreshFlags()
+        // 若官方新增了目录之外的点位所属区县，提示重进本页刷新列表
+        const newDistricts = Object.keys(groups).filter(d =>
+          !city.districts.some(x => x.district === d))
+        if (newDistricts.length) {
+          wx.showToast({ title: '检测到新区县数据，列表已更新', icon: 'none', duration: 2000 })
+          this.load()
+        }
         this.doneHint(total, city.city)
       },
     )

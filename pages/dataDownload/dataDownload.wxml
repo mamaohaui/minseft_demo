@@ -1,14 +1,9 @@
 <view class="page">
-  <!-- 说明卡 + 基础数据库导入/更新入口（不再设管理员门槛） -->
+  <!-- 说明卡（更新动作已整合进下载：每次下载自动同步官方最新数据） -->
   <view class="tip-card">
-    <view class="tip-head">
-      <view class="tip-title">⬇︎ 公共摆摊数据库</view>
-      <view class="base-btn {{updating ? 'base-btn-loading' : ''}}" hover-class="btn-pressed" hover-stay-time="60" catchtap="updateBase">
-        {{updating ? '更新中…' : '更新数据'}}
-      </view>
-    </view>
+    <view class="tip-title">⬇︎ 公共摆摊数据库</view>
     <view class="tip-text">这里是官方收集整理的公共摆摊基础数据（早市 / 夜市 / 农贸市场 / 批发市场等），按省 / 市 / 县下载，可整市一键下载或按区县单独下载。下载后地图「公共摊点」图层才会显示对应区域；你自己的发布、收藏和关注的地点不受影响、无需下载。</view>
-    <view class="tip-text tip-sub">「更新数据」会把官方最新收集整理的基础点位补充进来（已有数据不受影响，可放心点击）。</view>
+    <view class="tip-text tip-sub">每次下载都会自动同步官方最新收集整理的基础点位，无需单独更新。</view>
   </view>
 
   <view wx:if="{{loading}}" class="loading">加载中…</view>

@@ -10,6 +10,43 @@ const db = cloud.database()
 const BASE_CREATOR = 'base'
 const BASE_NAME = '摆摊基础库'
 
+// 成都各区中心坐标：与 listRegionPackages / getRegionSpots 保持一致的区域划分
+const DISTRICTS = [
+  { name: '锦江区', lat: 30.6561, lng: 104.0831 },
+  { name: '青羊区', lat: 30.6723, lng: 104.0622 },
+  { name: '金牛区', lat: 30.6958, lng: 104.0521 },
+  { name: '武侯区', lat: 30.6301, lng: 104.0433 },
+  { name: '成华区', lat: 30.6719, lng: 104.1082 },
+  { name: '高新区', lat: 30.5727, lng: 104.0621 },
+  { name: '龙泉驿区', lat: 30.5566, lng: 104.2745 },
+  { name: '温江区', lat: 30.6821, lng: 103.8565 },
+  { name: '郫都区', lat: 30.8121, lng: 103.9011 },
+  { name: '双流区', lat: 30.5744, lng: 103.9237 },
+  { name: '新都区', lat: 30.8235, lng: 104.1588 },
+]
+
+const regionOf = (lng, lat) => {
+  let best = null
+  let bestD = Infinity
+  for (const d of DISTRICTS) {
+    const dx = (lng - d.lng) * 95.5
+    const dy = (lat - d.lat) * 111
+    const dist = Math.sqrt(dx * dx + dy * dy)
+    if (dist < bestD) { bestD = dist; best = d }
+  }
+  if (best && bestD <= 25) return { province: '四川省', city: '成都市', district: best.name }
+  return { province: '其他地区', city: '其他', district: '其他' }
+}
+
+// 坐标归一化：GeoJSON / GeoPoint / {lng,lat} 全兼容
+const toLngLat = (p) => {
+  if (!p) return null
+  if (Array.isArray(p.coordinates) && p.coordinates.length >= 2) return { lng: p.coordinates[0], lat: p.coordinates[1] }
+  if (typeof p.longitude === 'number' && typeof p.latitude === 'number') return { lng: p.longitude, lat: p.latitude }
+  if (typeof p.lng === 'number' && typeof p.lat === 'number') return p
+  return null
+}
+
 // 成都基础摆摊点位（坐标为 GCJ-02 火星坐标近似值，管理员可在后台修正）
 // 覆盖：早市/农贸市场（果蔬）、夜市（小吃）、批发市场（水果/食品/日杂）、政府划定便民摊区
 const BASE_SPOTS = [
@@ -81,9 +118,10 @@ const BASE_SPOTS = [
 ]
 
 exports.main = async (event) => {
-  // 公共基础数据库导入已并入「公共数据下载」页，不再做管理员校验：
+  // 公共基础数据库导入已并入「公共数据下载」页的下载动作，不再做管理员校验：
   // 数据是官方收集整理的公开信息，且幂等（只补缺失点位），任何用户触发都安全
-  const autoseed = !!(event && event.autoseed) // 保留标志仅用于日志区分来源
+  // withData=true：播种（更新）后直接返回全部基础库点位——下载 = 更新 + 拉取，一步到位
+  const withData = !!(event && event.withData)
 
   // 幂等：查出基础库已有的标题，重复的跳过（分页拉全量，突破单次100条限制）
   let existTitles = []
@@ -138,5 +176,30 @@ exports.main = async (event) => {
     added++
   }
 
-  return { ok: true, data: { total: BASE_SPOTS.length, added, skipped } }
+  const result = { total: BASE_SPOTS.length, added, skipped }
+
+  // withData：返回全部基础库点位（坐标归一化 + 区域分组），前端下载时直接使用
+  // （下载即更新：每次下载都会先补齐缺失点位，保证拿到的是最新数据）
+  if (withData) {
+    const res = await db.collection('spots')
+      .where({ visibility: 'public', source: 'base' })
+      .limit(1000)
+      .get()
+      .catch(() => null)
+    const spots = []
+    ;(((res && res.data) || []).forEach(s => {
+      if (!s.current) return
+      const p = toLngLat(s.current.location)
+      if (!p) return
+      s.current.location = p // 归一化，前端直接可用
+      const r = regionOf(p.lng, p.lat)
+      s.province = r.province
+      s.city = r.city
+      s.district = r.district // 前端按区县分组写数据包
+      spots.push(s)
+    }))
+    result.spots = spots
+  }
+
+  return { ok: true, data: result }
 }
