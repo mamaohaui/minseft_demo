@@ -136,10 +136,19 @@ Page({
       `确定下载「${district}」的公共摊点数据吗？下载后地图公共图层将显示该区域摊点。`,
       async () => {
         wx.showLoading({ title: '下载中…', mask: true })
-        const r = await callCloud('getRegionSpots', { province, city, district })
+        // 静默调用：失败提示统一由本页处理（区分未部署 / 网络异常 / 云端数据为空）
+        const r = await callCloud('getRegionSpots', { province, city, district }, { silent: true })
         wx.hideLoading()
         if (!r.ok) {
-          wx.showToast({ title: r.message || '下载失败，请重试', icon: 'none' })
+          const tip = r.code === 'NOT_DEPLOYED' ? '云函数 getRegionSpots 未部署'
+            : r.code === 'NETWORK' ? '网络异常，请稍后重试'
+            : (r.message || '下载失败，请重试')
+          wx.showToast({ title: tip, icon: 'none', duration: 2500 })
+          return
+        }
+        if (!(r.data || []).length) {
+          // 目录里该区县有数据、云端却拉不到：多为云端基础库未初始化（版本不一致）
+          wx.showToast({ title: '该区域暂无公共数据，请点「更新数据」后再试', icon: 'none', duration: 2500 })
           return
         }
         const pkgs = wx.getStorageSync(PKG_KEY) || {}
@@ -156,9 +165,46 @@ Page({
     )
   },
 
+  // 拉取整市公共点位：优先一次调用整市拉取（新版云函数）；
+  // 调用失败（旧版云函数不认省+市 / 网络异常 / 未部署）或拉到 0 条时，
+  // 自动降级为逐区县拉取，全部下级区域照常落地
+  async fetchCitySpots(city) {
+    let groups = {}
+    let total = 0
+    let lastCode = ''
+
+    const r = await callCloud('getRegionSpots', { province: city.province, city: city.city }, { silent: true })
+    if (r.ok) {
+      total = (r.data || []).length
+      ;(r.data || []).forEach(s => {
+        const d = s.district || '其他'
+        ;(groups[d] = groups[d] || []).push(s)
+      })
+    } else {
+      lastCode = r.code || '' // INVALID=旧版云函数 / NETWORK / NOT_DEPLOYED
+    }
+
+    if (!Object.keys(groups).length) {
+      for (const d of city.districts) {
+        const rd = await callCloud(
+          'getRegionSpots',
+          { province: city.province, city: city.city, district: d.district },
+          { silent: true },
+        )
+        if (rd.ok) {
+          lastCode = ''
+          total += (rd.data || []).length
+          groups[d.district] = rd.data || []
+        } else {
+          lastCode = rd.code || lastCode
+        }
+      }
+    }
+    return { groups, total, lastCode }
+  },
+
   // 整市一键下载：全部下级区县的数据包都下载
-  // 优先一次云端调用整市拉取；若云端还是旧版 getRegionSpots（不认省+市、报「缺少区域参数」），
-  // 自动降级为逐个区县下载，效果一致（各区县数据包全部落地）
+  // 三重容错：①整市一次拉取 ②失败/拉空降级逐区县 ③仍为空自动初始化基础库后重试
   downloadCity(e) {
     const { pi, ci } = e.currentTarget.dataset
     const city = this.data.tree[pi].cities[ci]
@@ -172,36 +218,25 @@ Page({
       `确定下载「${city.city}」全部 ${city.districts.length} 个区县（共 ${city.total} 个摊点）的数据包吗？`,
       async () => {
         wx.showLoading({ title: '下载中…', mask: true })
-        let groups = {}
-        let total = 0
+        let { groups, total, lastCode } = await this.fetchCitySpots(city)
 
-        // 1) 尝试整市一次拉取（新版云函数）；静默调用，失败不弹错（下方有降级）
-        const r = await callCloud('getRegionSpots', { province: city.province, city: city.city }, { silent: true })
-        if (r.ok) {
-          total = (r.data || []).length
-          ;(r.data || []).forEach(s => {
-            const d = s.district || '其他'
-            ;(groups[d] = groups[d] || []).push(s)
-          })
-        } else if (r.code === 'INVALID') {
-          // 2) 云端为旧版（district 必填）：逐区县静默下载，全部下级区域都落地
-          for (const d of city.districts) {
-            const rd = await callCloud(
-              'getRegionSpots',
-              { province: city.province, city: city.city, district: d.district },
-              { silent: true },
-            )
-            if (rd.ok) {
-              total += (rd.data || []).length
-              groups[d.district] = rd.data || []
-            }
-          }
+        // 自愈：一个点位都没拿到但目录明明有数据 → 自动初始化基础库后重试一次
+        // （覆盖「目录统计到了数据、云端基础库却是空的」这类云端版本不一致场景）
+        if (!total && city.total > 0) {
+          wx.showLoading({ title: '初始化公共数据库…', mask: true })
+          await callCloud('seedSpots', { autoseed: true }, { silent: true })
+          const retry = await this.fetchCitySpots(city)
+          groups = retry.groups
+          total = retry.total
+          lastCode = retry.lastCode
         }
 
         wx.hideLoading()
-        if (!Object.keys(groups).length) {
-          const tip = r.code === 'NOT_DEPLOYED' ? '云函数 getRegionSpots 未部署' : '下载失败，请重试'
-          wx.showToast({ title: tip, icon: 'none' })
+        if (!total) {
+          const tip = lastCode === 'NOT_DEPLOYED' ? '云函数 getRegionSpots 未部署'
+            : lastCode === 'NETWORK' ? '网络异常，请稍后重试'
+            : '云端公共数据为空，请点「更新数据」后再试'
+          wx.showToast({ title: tip, icon: 'none', duration: 2500 })
           return
         }
         // 按区县逐包写入本地（与单个下载的存储结构一致）
