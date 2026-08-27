@@ -2,7 +2,7 @@ const { callCloud } = require('../../utils/cloud')
 const { REGIONS, regionOf } = require('../../utils/constants')
 
 const FOCUS_MARKER_ID = 999999 // 「查看」目标标志固定 id
-const DEFAULT_REGION = REGIONS[0] // 定位失败时的兜底：成都市中心
+const DEFAULT_REGION = REGIONS[0] // 定位失败时的兜底：默认地区（列表首个区县）
 const PKG_KEY = 'offlineRegionPackages' // 离线数据包 storage 键（与公共数据下载页一致）
 
 // 坐标归一化兜底：兼容 GeoJSON {coordinates} / GeoPoint {longitude,latitude} / 已是 {lng,lat}
@@ -128,7 +128,7 @@ Page({
       },
       fail: () => {
         if (!this._focusSpot) wx.showToast({ title: '定位失败，显示默认地区', icon: 'none' })
-        // 定位失败兜底：回到当前选择的地区中心（默认成都市中心）
+        // 定位失败兜底：回到当前选择的地区中心（默认地区）
         const spot = this._focusSpot
         const lng = spot ? spot.lng : this.data.centerLng
         const lat = spot ? spot.lat : this.data.centerLat

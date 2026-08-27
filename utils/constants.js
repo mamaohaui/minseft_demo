@@ -10,7 +10,6 @@ const SPOT_TYPES = ['早市', '夜市', '全天', '免费', '收费']
 
 // 地图页地区选择器：选区后以该地区中心点加载周边摊点（公共摊点基础显示入口）
 const REGIONS = [
-  { name: '成都市中心', lat: 30.6622, lng: 104.0656 },
   { name: '锦江区', lat: 30.6561, lng: 104.0831 },
   { name: '青羊区', lat: 30.6723, lng: 104.0622 },
   { name: '金牛区', lat: 30.6958, lng: 104.0521 },
@@ -31,12 +30,11 @@ const VISIBILITY = [
 ]
 
 // 坐标 → 区域：就近归入成都区县（25km 内），超出归"其他地区"
-// 与云函数 listRegionPackages / getRegionSpots 的划分逻辑保持一致（不含"成都市中心"占位）
+// 与云函数 listRegionPackages / getRegionSpots 的划分逻辑保持一致
 const regionOf = (lng, lat) => {
-  const districts = REGIONS.filter(r => r.name !== '成都市中心')
   let best = null
   let bestD = Infinity
-  for (const d of districts) {
+  for (const d of REGIONS) {
     const dx = (lng - d.lng) * 95.5 // 北纬30.6° 经度每度约 95.5km
     const dy = (lat - d.lat) * 111
     const dist = Math.sqrt(dx * dx + dy * dy)
