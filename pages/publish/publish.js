@@ -14,6 +14,13 @@ Page({
     },
     location: null, // { lng, lat }
     editing: false,
+    visibilityLabel: VISIBILITY[0].label,
+  },
+
+  // value → label
+  visLabel(v) {
+    const opt = VISIBILITY.find(o => o.value === v)
+    return opt ? opt.label : v
   },
 
   onLoad(options) {
@@ -28,10 +35,13 @@ Page({
   async loadSpot() {
     const r = await callCloud('getSpotDetail', { spotId: this.spotId })
     if (!r.ok) return
-    const cur = r.data.current || {}
+    const spot = r.data
+    // 被驳回的新建地点 current 为 null，需回填 pending；visibility 是顶层字段，单独恢复
+    const src = spot.current || spot.pending || {}
     this.setData({
-      form: { ...this.data.form, ...cur },
-      location: cur.location,
+      form: { ...this.data.form, ...src, visibility: spot.visibility || 'public' },
+      location: src.location,
+      visibilityLabel: this.visLabel(spot.visibility || 'public'),
     })
   },
 
@@ -44,7 +54,8 @@ Page({
     const key = e.currentTarget.dataset.key
     const idx = e.detail.value
     if (key === 'visibility') {
-      this.setData({ 'form.visibility': this.data.visibilityOptions[idx].value })
+      const v = this.data.visibilityOptions[idx].value
+      this.setData({ 'form.visibility': v, visibilityLabel: this.visLabel(v) })
     } else {
       this.setData({ [`form.${key}`]: this.data[key][idx] })
     }

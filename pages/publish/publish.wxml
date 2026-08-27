@@ -18,7 +18,7 @@
   <input data-key="feeAmount" value="{{form.feeAmount}}" type="number" placeholder="费用金额（元，免费填0）" bindinput="onFeeAmount" />
 
   <picker data-key="visibility" range="{{visibilityOptions}}" range-key="label" bindchange="onPicker">
-    <view>可见性：{{form.visibility}}</view>
+    <view>可见性：{{visibilityLabel}}</view>
   </picker>
 
   <view class="loc" bindtap="chooseLocation">

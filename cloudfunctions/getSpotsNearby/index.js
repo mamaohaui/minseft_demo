@@ -34,6 +34,7 @@ exports.main = async (event) => {
   // 附查询：创建者自己的 private 地点
   const priv = await db.collection('spots')
     .where({ creatorOpenid: OPENID, visibility: 'private' })
+    .limit(50)
     .get()
 
   const all = main.data.concat(priv.data).map(s => {

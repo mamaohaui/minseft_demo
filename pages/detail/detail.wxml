@@ -14,10 +14,56 @@
     <button wx:if="{{isOwner}}" size="mini" bindtap="del">删除</button>
   </view>
 
-  <view class="section-title">评价</view>
-  <view wx:if="{{reviews.length === 0}}" class="empty">暂无评价</view>
+  <!-- 写评价 -->
+  <view class="section-title">写评价</view>
+  <view wx:if="{{!iReviewed}}" class="review-form">
+    <view class="stars">
+      <text wx:for="{{[1,2,3,4,5]}}" wx:key="*this"
+        class="star {{item <= form.rating ? 'on' : ''}}"
+        data-v="{{item}}" bindtap="setRating">★</text>
+      <text class="stars-tip">{{form.rating}} 分</text>
+    </view>
+    <view class="tag-list">
+      <text wx:for="{{reviewTags}}" wx:key="name"
+        class="tag {{item.selected ? 'on' : ''}}"
+        data-tag="{{item.name}}" bindtap="toggleTag">{{item.name}}</text>
+    </view>
+    <textarea class="review-input" placeholder="说说这里怎么样…（选填）"
+      value="{{form.content}}" bindinput="onContent" maxlength="200" />
+    <button class="submit-btn" size="mini" type="primary" bindtap="submitReview" disabled="{{submitting}}">
+      {{submitting ? '提交中…' : '提交评价'}}
+    </button>
+  </view>
+  <view wx:else class="reviewed-bar">
+    <text>已评价（{{form.rating}} 分）</text>
+    <text class="reviewed-edit" bindtap="openForm">修改</text>
+  </view>
+  <view wx:if="{{iReviewed && showForm}}" class="review-form">
+    <view class="stars">
+      <text wx:for="{{[1,2,3,4,5]}}" wx:key="*this"
+        class="star {{item <= form.rating ? 'on' : ''}}"
+        data-v="{{item}}" bindtap="setRating">★</text>
+      <text class="stars-tip">{{form.rating}} 分</text>
+    </view>
+    <view class="tag-list">
+      <text wx:for="{{reviewTags}}" wx:key="name"
+        class="tag {{item.selected ? 'on' : ''}}"
+        data-tag="{{item.name}}" bindtap="toggleTag">{{item.name}}</text>
+    </view>
+    <textarea class="review-input" placeholder="说说这里怎么样…（选填）"
+      value="{{form.content}}" bindinput="onContent" maxlength="200" />
+    <button class="submit-btn" size="mini" type="primary" bindtap="submitReview" disabled="{{submitting}}">
+      {{submitting ? '提交中…' : '更新评价'}}
+    </button>
+  </view>
+
+  <view class="section-title">评价（{{reviews.length}}）</view>
+  <view wx:if="{{reviews.length === 0}}" class="empty">暂无评价，来抢沙发～</view>
   <view wx:for="{{reviews}}" wx:key="_id" class="review">
-    <view>评分 {{item.rating}} 分 · {{item.content}}</view>
+    <view class="review-head">
+      <text class="review-star">★ {{item.rating}}</text>
+      <text wx:if="{{item.content}}" class="review-content">{{item.content}}</text>
+    </view>
     <view wx:if="{{item.tags.length}}" class="tags">{{item.tags}}</view>
   </view>
 </view>

@@ -28,5 +28,6 @@ exports.main = async () => {
     user = newUser
   }
 
-  return { ok: true, data: { _id: OPENID, ...user } }
+  const admins = (process.env.adminOpenids || '').split(',').map(s => s.trim())
+  return { ok: true, data: { _id: OPENID, ...user, isAdmin: admins.includes(OPENID) } }
 }

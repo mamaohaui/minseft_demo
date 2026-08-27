@@ -16,5 +16,8 @@ exports.main = async (event) => {
   }
 
   await db.collection('spots').doc(spotId).remove()
+  // 级联清理：删除该地点的评价与收藏，避免孤儿数据
+  await db.collection('reviews').where({ spotId }).remove()
+  await db.collection('favorites').where({ spotId }).remove()
   return { ok: true }
 }

@@ -1,9 +1,24 @@
 <map
+  id="map"
   class="map"
   latitude="{{latitude}}"
   longitude="{{longitude}}"
   markers="{{markers}}"
   show-location
   bindmarkertap="onMarkerTap"
+  bindregionchange="onRegionChange"
 />
 <view class="publish-btn" bindtap="goPublish">＋ 发布地点</view>
+
+<view class="map-ctrl top-left" bindtap="backToLocation">
+  <text class="ctrl-icon">◎</text>
+  <text class="ctrl-text">回到定位</text>
+</view>
+<view class="map-ctrl top-right" bindtap="refresh">
+  <text class="ctrl-icon">⟳</text>
+  <text class="ctrl-text">刷新</text>
+</view>
+
+<view wx:if="{{loaded && markers.length === 0}}" class="empty-tip">
+  附近 5 公里还没有摆摊点，点右下角发布第一个吧！
+</view>

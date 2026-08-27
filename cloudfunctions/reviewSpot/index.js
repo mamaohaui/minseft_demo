@@ -26,9 +26,12 @@ exports.main = async (event) => {
 
   if (action === 'approve') {
     const p = spot.pending
+    if (!p || !p.location) {
+      return { ok: false, code: 'NO_PENDING', message: '该地点没有待审内容' }
+    }
     // pending.location 从库里读出是 GeoJSON {type:'Point',coordinates:[lng,lat]}，
     // 必须用 db.Geo.Point 重新构造，直接 _.set(spot.pending) 会把 GeoPoint 写成普通对象导致写入失败
-    const loc = p.location || {}
+    const loc = p.location
     const current = {
       title: p.title,
       category: p.category,

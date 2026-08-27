@@ -16,7 +16,9 @@ exports.main = async (event) => {
   } catch (e) {}
 
   const visCond = role === 'vip' ? _.in(['public', 'vip']) : 'public'
-  const reg = db.RegExp({ regexp: keyword, options: 'i' })
+  // 转义正则特殊字符，防止用户输入 ( [ \ 等导致查询报错，按字面量匹配
+  const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const reg = db.RegExp({ regexp: escapeRegExp(keyword), options: 'i' })
 
   const res = await db.collection('spots')
     .where({

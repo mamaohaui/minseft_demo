@@ -22,14 +22,24 @@ exports.main = async (event) => {
   }
 
   if (spot.visibility === 'private') {
-    await db.collection('spots').doc(spotId).update({
-      data: { current: _.set(content), updatedAt: db.serverDate() },
-    })
+    const data = { current: _.set(content), updatedAt: db.serverDate() }
+    // 被驳回后改为私人：直改 current 并重置状态，清空残留的驳回标记
+    if (spot.status === 'rejected') {
+      data.status = 'approved'
+      data.rejectReason = null
+      data.pending = null
+      data.hasPendingUpdate = false
+    }
+    await db.collection('spots').doc(spotId).update({ data })
   } else {
     // PR 式：current 不变，pending 存新版本，标注待公布
-    await db.collection('spots').doc(spotId).update({
-      data: { pending: _.set(content), hasPendingUpdate: true, updatedAt: db.serverDate() },
-    })
+    const data = { pending: _.set(content), hasPendingUpdate: true, updatedAt: db.serverDate() }
+    // 被驳回后重新提交：重置为待审核并清空驳回原因，重新进入审核队列
+    if (spot.status === 'rejected') {
+      data.status = 'pending'
+      data.rejectReason = null
+    }
+    await db.collection('spots').doc(spotId).update({ data })
   }
 
   return { ok: true }

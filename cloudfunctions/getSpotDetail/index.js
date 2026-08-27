@@ -20,5 +20,8 @@ exports.main = async (event) => {
   const toLngLat = (p) => p && p.coordinates ? { lng: p.coordinates[0], lat: p.coordinates[1] } : p
   if (spot.current && spot.current.location) spot.current.location = toLngLat(spot.current.location)
   if (spot.pending && spot.pending.location) spot.pending.location = toLngLat(spot.pending.location)
-  return { ok: true, data: spot }
+
+  // 当前用户是否已收藏（详情页按钮初始状态）
+  const fav = await db.collection('favorites').where({ openid: OPENID, spotId }).get()
+  return { ok: true, data: { ...spot, favorited: fav.data.length > 0 } }
 }
