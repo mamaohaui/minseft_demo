@@ -17,17 +17,18 @@
 
   <scroll-view wx:else class="list-scroll" scroll-y bindscrolltolower="loadMore" lower-threshold="100">
     <view wx:for="{{list}}" wx:key="_id" class="card" hover-class="card-pressed" hover-stay-time="80">
-    <view class="card-head">
-      <text class="card-title">{{item.title}}</text>
-      <text class="card-tag">{{item.category}}</text>
-    </view>
-    <view class="card-content">{{item.content}}</view>
-    <view class="card-foot">
-      <text class="card-time">{{item._time}}</text>
-      <view class="card-contact" hover-class="link-pressed" hover-stay-time="60"
-            data-contact="{{item.contact}}" bindtap="copyContact">
-        <text class="contact-label">联系</text>
-        <text class="contact-value">{{item.contact}}</text>
+      <view class="card-head">
+        <text class="card-title">{{item.title}}</text>
+        <text class="card-tag">{{item.category}}</text>
+      </view>
+      <view class="card-content">{{item.content}}</view>
+      <view class="card-foot">
+        <text class="card-time">{{item._time}}</text>
+        <view class="card-contact" hover-class="link-pressed" hover-stay-time="60"
+              data-contact="{{item.contact}}" bindtap="copyContact">
+          <text class="contact-label">联系</text>
+          <text class="contact-value">{{item.contact}}</text>
+        </view>
       </view>
     </view>
     <view wx:if="{{hasMore}}" class="tip load-more">上拉加载更多</view>
