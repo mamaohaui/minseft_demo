@@ -2,9 +2,10 @@ const { callCloud } = require('../../utils/cloud')
 
 Page({
   data: {
-    latitude: 30.657,
+    latitude: 30.657,   // 地图渲染中心（仅定位/回到定位时更新）
     longitude: 104.081,
-    scale: 16,
+    centerLat: 30.657,  // 地图当前中心（regionchange 记录，供刷新用，不参与渲染）
+    centerLng: 104.081,
     markers: [],
     spots: [],
     loaded: false,    // 首次加载完成（控制空态提示闪现）
@@ -73,16 +74,14 @@ Page({
 
   // 按地图当前中心刷新
   refresh() {
-    this.loadNearby(this.data.longitude, this.data.latitude)
+    this.loadNearby(this.data.centerLng, this.data.centerLat)
   },
 
-  // 地图移动后记录中心，供刷新使用（值未变化时不 setData，避免触发地图重渲染打断缩放手势）
+  // 地图移动后记录中心（仅记到 centerLat/Lng，不触碰渲染属性，避免触发地图重定位造成闪烁）
   onRegionChange(e) {
     if (e.type === 'end' && e.detail && e.detail.centerLocation) {
       const c = e.detail.centerLocation
-      if (Math.abs(c.latitude - this.data.latitude) < 1e-9
-        && Math.abs(c.longitude - this.data.longitude) < 1e-9) return
-      this.setData({ latitude: c.latitude, longitude: c.longitude })
+      this.setData({ centerLat: c.latitude, centerLng: c.longitude })
     }
   },
 

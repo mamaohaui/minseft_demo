@@ -3,7 +3,7 @@
   class="map"
   latitude="{{latitude}}"
   longitude="{{longitude}}"
-  scale="{{scale}}"
+  scale="16"
   min-scale="3"
   max-scale="20"
   enable-zoom
