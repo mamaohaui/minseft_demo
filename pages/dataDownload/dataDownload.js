@@ -175,8 +175,8 @@ Page({
         let groups = {}
         let total = 0
 
-        // 1) 尝试整市一次拉取（新版云函数）
-        const r = await callCloud('getRegionSpots', { province: city.province, city: city.city })
+        // 1) 尝试整市一次拉取（新版云函数）；静默调用，失败不弹错（下方有降级）
+        const r = await callCloud('getRegionSpots', { province: city.province, city: city.city }, { silent: true })
         if (r.ok) {
           total = (r.data || []).length
           ;(r.data || []).forEach(s => {
@@ -184,9 +184,13 @@ Page({
             ;(groups[d] = groups[d] || []).push(s)
           })
         } else if (r.code === 'INVALID') {
-          // 2) 云端为旧版：逐区县下载（全部下级区域都下载）
+          // 2) 云端为旧版（district 必填）：逐区县静默下载，全部下级区域都落地
           for (const d of city.districts) {
-            const rd = await callCloud('getRegionSpots', { province: city.province, city: city.city, district: d.district })
+            const rd = await callCloud(
+              'getRegionSpots',
+              { province: city.province, city: city.city, district: d.district },
+              { silent: true },
+            )
             if (rd.ok) {
               total += (rd.data || []).length
               groups[d.district] = rd.data || []
@@ -196,7 +200,8 @@ Page({
 
         wx.hideLoading()
         if (!Object.keys(groups).length) {
-          wx.showToast({ title: '下载失败，请重试', icon: 'none' })
+          const tip = r.code === 'NOT_DEPLOYED' ? '云函数 getRegionSpots 未部署' : '下载失败，请重试'
+          wx.showToast({ title: tip, icon: 'none' })
           return
         }
         // 按区县逐包写入本地（与单个下载的存储结构一致）
