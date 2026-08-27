@@ -28,12 +28,13 @@ exports.main = async (event) => {
   if (spot.pending && spot.pending.location) spot.pending.location = toLngLat(spot.pending.location)
 
   // 当前用户是否已收藏 + 是否为创建者（前端省一次 getUser 调用）
-  const fav = await db.collection('favorites').where({ openid: OPENID, spotId }).get()
+  // 注意：用户从未收藏过时 favorites 集合可能不存在，查询会抛错，必须 catch 兜底
+  const fav = await db.collection('favorites').where({ openid: OPENID, spotId }).get().catch(() => null)
   return {
     ok: true,
     data: {
       ...spot,
-      favorited: fav.data.length > 0,
+      favorited: !!(fav && fav.data && fav.data.length > 0),
       isOwner: spot.creatorOpenid === OPENID,
     },
   }

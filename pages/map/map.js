@@ -193,12 +193,14 @@ Page({
   },
 
   onMarkerTap(e) {
+    // 兼容两种事件形状：部分基础库 markerId 在 e 上，部分在 e.detail 里
+    const markerId = (e && e.markerId !== undefined) ? e.markerId : (e && e.detail && e.detail.markerId)
     // 目标标志（查看跳转）：直接进该点详情
-    if (e.markerId === FOCUS_MARKER_ID && this._focusSpot) {
+    if (markerId === FOCUS_MARKER_ID && this._focusSpot) {
       wx.navigateTo({ url: `/pages/detail/detail?id=${this._focusSpot._id}` })
       return
     }
-    const spot = this.data.spots[e.markerId]
+    const spot = this.data.spots[markerId]
     if (spot) {
       wx.navigateTo({ url: `/pages/detail/detail?id=${spot._id}` })
     }

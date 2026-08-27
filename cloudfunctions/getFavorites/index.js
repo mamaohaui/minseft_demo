@@ -6,8 +6,9 @@ const _ = db.command
 
 exports.main = async () => {
   const { OPENID } = cloud.getWXContext()
-  const favs = await db.collection('favorites').where({ openid: OPENID }).get()
-  const ids = favs.data.map(f => f.spotId)
+  // favorites 集合可能尚不存在（用户从未收藏过），catch 兜底返回空列表
+  const favs = await db.collection('favorites').where({ openid: OPENID }).get().catch(() => null)
+  const ids = (favs && favs.data || []).map(f => f.spotId)
   if (ids.length === 0) return { ok: true, data: [] }
 
   const spots = await db.collection('spots').where({ _id: _.in(ids) }).get()
