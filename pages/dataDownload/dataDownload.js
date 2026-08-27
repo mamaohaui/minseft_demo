@@ -104,16 +104,13 @@ Page({
   },
 
   // 拉取公共点位（下载 = 更新 + 拉取，一步到位）
-  // ① 首选 seedSpots({withData})：新版云函数播种补齐缺失点位后直接返回全部基础库点位
-  //    —— 每次下载都自动同步官方最新数据，无需单独「更新数据」
-  // ② 云端 seedSpots 为旧版（不返回 spots）时，退回 getRegionSpots 拉取：
-  //    先整市一次拉取，再降级逐区县拉取，全部下级区域照常落地
+  // 只通过 seedSpots({withData: true})：新版云函数播种补齐缺失点位后，
+  // 直接返回全部基础库点位（含 province/city/district），无需单独「更新数据」
   // 返回 { groups: {区县: [点位]}, total, seed }
   async fetchCitySpots(city) {
     let groups = {}
     let total = 0
 
-    // ① 更新 + 拉取一体化：seedSpots 新版直接返回全部基础库点位（含 province/city/district）
     const seed = await callCloud('seedSpots', { withData: true }, { silent: true })
     const seedSpots = seed.ok && seed.data && Array.isArray(seed.data.spots) ? seed.data.spots : null
     if (seedSpots && seedSpots.length) {
@@ -123,30 +120,6 @@ Page({
         ;(groups[d] = groups[d] || []).push(s)
         total++
       })
-      if (total) return { groups, total, seed }
-    }
-
-    // ② 退回 getRegionSpots（兼容云端旧版部署组合）
-    const r = await callCloud('getRegionSpots', { province: city.province, city: city.city }, { silent: true })
-    if (r.ok && (r.data || []).length) {
-      total = r.data.length
-      r.data.forEach(s => {
-        const d = s.district || '其他'
-        ;(groups[d] = groups[d] || []).push(s)
-      })
-    } else {
-      // 整市接口不可用（旧版 / 未部署）：逐区县拉取
-      for (const d of city.districts) {
-        const rd = await callCloud(
-          'getRegionSpots',
-          { province: city.province, city: city.city, district: d.district },
-          { silent: true },
-        )
-        if (rd.ok && (rd.data || []).length) {
-          total += rd.data.length
-          groups[d.district] = rd.data
-        }
-      }
     }
     return { groups, total, seed }
   },
@@ -164,30 +137,28 @@ Page({
     if (!seed || !seed.ok) {
       if (seed && seed.code === 'NOT_DEPLOYED') {
         lines.push('云函数 seedSpots 未部署')
-        onlyDeploy.push('① seedSpots（基础数据更新+下载，最关键）')
       } else if (seed && seed.code === 'FORBIDDEN') {
         lines.push('云端 seedSpots 是旧版本（仍校验管理员身份，导入被拒绝）')
-        onlyDeploy.push('① seedSpots（基础数据更新+下载，最关键）')
       } else {
         lines.push('基础数据同步失败（网络异常）')
       }
+      onlyDeploy.push('① seedSpots（基础数据更新+下载）')
     } else if (!(seed.data && Array.isArray(seed.data.spots))) {
       // seedSpots 成功但没有返回点位数据：云端是「无管理员校验」的中间版本
       lines.push(`云端 seedSpots 为旧版本（不能直接返回下载数据；基础库共 ${baseTotal > 0 ? baseTotal : ((seed.data && seed.data.total) || 0)} 个点位）`)
-      onlyDeploy.push('① seedSpots（基础数据更新+下载，最关键）')
+      onlyDeploy.push('① seedSpots（基础数据更新+下载）')
+    } else if (!seed.data.spots.length && baseTotal > 0) {
+      lines.push(`云端基础库已有 ${baseTotal} 个点位，但 seedSpots 未返回任何点位`)
+      onlyDeploy.push('① seedSpots（基础数据更新+下载）')
     }
 
-    if (!onlyDeploy.length && baseTotal > 0) {
-      lines.push(`云端基础库已有 ${baseTotal} 个点位，但下载接口均未返回数据（getRegionSpots 版本过旧）`)
-      onlyDeploy.push('① getRegionSpots（区域数据拉取）')
-    }
     if (!lines.length) lines.push('云端公共数据为空')
 
     wx.showModal({
       title: '下载失败 · 诊断结果',
       content: lines.join('；') +
         '。\n\n解决办法：在微信开发者工具左侧展开 cloudfunctions 目录，右键以下云函数选择「上传并部署：云端安装依赖」——\n' +
-        (onlyDeploy.length ? onlyDeploy.join('\n') : '① seedSpots（基础数据更新+下载）\n② getRegionSpots（区域数据拉取）') +
+        (onlyDeploy.length ? onlyDeploy.join('\n') : '① seedSpots（基础数据更新+下载）') +
         '\n部署完成后回到本页重试即可。',
       confirmText: '我知道了',
       showCancel: false,
