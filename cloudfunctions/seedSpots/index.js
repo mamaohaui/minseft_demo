@@ -10,7 +10,7 @@ const db = cloud.database()
 const BASE_CREATOR = 'base'
 const BASE_NAME = '摆摊基础库'
 
-// 成都各区中心坐标：与 listRegionPackages / getRegionSpots 保持一致的区域划分
+// 成都各区中心坐标：与 listRegionPackages 保持一致的区域划分
 const DISTRICTS = [
   { name: '锦江区', lat: 30.6561, lng: 104.0831 },
   { name: '青羊区', lat: 30.6723, lng: 104.0622 },
