@@ -8,6 +8,12 @@ exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
   const { spotId, title, location, category, timeSlot, positionReq, mgmtReq, feeType, feeAmount } = event
 
+  if (!spotId) return { ok: false, code: 'INVALID', message: '缺少地点 ID' }
+  if (!title || !title.trim()) return { ok: false, code: 'INVALID', message: '标题必填' }
+  if (!location || typeof location.lng !== 'number' || typeof location.lat !== 'number') {
+    return { ok: false, code: 'INVALID', message: '坐标必填且必须为数字' }
+  }
+
   const res = await db.collection('spots').doc(spotId).get().catch(() => null)
   if (!res || !res.data) return { ok: false, code: 'NOT_FOUND', message: '该地点不存在' }
   const spot = res.data

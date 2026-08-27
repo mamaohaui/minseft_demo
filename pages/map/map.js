@@ -4,6 +4,7 @@ const { REGIONS, regionOf } = require('../../utils/constants')
 const FOCUS_MARKER_ID = 999999 // 「查看」目标标志固定 id
 const DEFAULT_REGION = REGIONS[0] // 定位失败时的兜底：默认地区（列表首个区县）
 const PKG_KEY = 'offlineRegionPackages' // 离线数据包 storage 键（与公共数据下载页一致）
+const MAX_MARKERS = 100 // 地图 marker 上限，防止点位过多导致渲染卡顿
 
 // 坐标归一化兜底：兼容 GeoJSON {coordinates} / GeoPoint {longitude,latitude} / 已是 {lng,lat}
 const toLatLng = (loc) => {
@@ -199,6 +200,8 @@ Page({
     })
     const f = focus || this._focusSpot
     if (f) spots = spots.filter(s => s._id !== f._id)
+    // 控制 marker 总量，避免地图渲染卡顿（焦点标志不计入上限）
+    if (spots.length > MAX_MARKERS) spots = spots.slice(0, MAX_MARKERS)
     const markers = spots.map((s, i) => ({
       id: i,
       latitude: s.current.location.lat,

@@ -25,6 +25,8 @@
 .chip-pressed { opacity: 0.6; }
 
 .tip { text-align: center; color: #8e8e93; font-size: 27rpx; padding: 120rpx 0; }
+.list-scroll { height: calc(100vh - 180rpx); }
+.load-more { padding: 40rpx 0 120rpx; font-size: 24rpx; }
 
 /* ===== 资源卡片 ===== */
 .card {

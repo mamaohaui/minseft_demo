@@ -12,10 +12,11 @@
   </scroll-view>
 
   <!-- 列表 -->
-  <view wx:if="{{loading}}" class="tip">加载中…</view>
+  <view wx:if="{{loading && list.length === 0}}" class="tip">加载中…</view>
   <view wx:elif="{{list.length === 0}}" class="tip">该分类下暂无资源信息</view>
 
-  <view wx:for="{{list}}" wx:key="_id" class="card" hover-class="card-pressed" hover-stay-time="80">
+  <scroll-view wx:else class="list-scroll" scroll-y bindscrolltolower="loadMore" lower-threshold="100">
+    <view wx:for="{{list}}" wx:key="_id" class="card" hover-class="card-pressed" hover-stay-time="80">
     <view class="card-head">
       <text class="card-title">{{item.title}}</text>
       <text class="card-tag">{{item.category}}</text>
@@ -29,7 +30,9 @@
         <text class="contact-value">{{item.contact}}</text>
       </view>
     </view>
-  </view>
+    <view wx:if="{{hasMore}}" class="tip load-more">上拉加载更多</view>
+    <view wx:elif="{{list.length > 0}}" class="tip load-more">已经到底啦</view>
+  </scroll-view>
 
   <!-- 发布资源入口（iOS 胶囊悬浮钮） -->
   <view class="fab" hover-class="fab-pressed" hover-stay-time="80" bindtap="goPublish">

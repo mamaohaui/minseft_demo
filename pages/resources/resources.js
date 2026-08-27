@@ -4,15 +4,29 @@ const { callCloud } = require('../../utils/cloud')
 const CATEGORIES = ['全部', '货源供应', '摊位转让', '设备租赁', '合伙招募', '政策资讯', '其他']
 
 Page({
-  data: { categories: CATEGORIES, active: '全部', list: [], loading: true },
+  data: { categories: CATEGORIES, active: '全部', list: [], loading: false, page: 0, hasMore: true },
 
   onShow() { this.load() },
 
   async load() {
-    this.setData({ loading: true })
-    const r = await callCloud('listResources', { category: this.data.active })
+    this.setData({ loading: true, page: 0, hasMore: true })
+    const r = await callCloud('listResources', { category: this.data.active, page: 0 })
     const list = (r.ok ? r.data : []).map(it => ({ ...it, _time: this.fmtTime(it.createdAt) }))
-    this.setData({ list, loading: false })
+    this.setData({ list, loading: false, hasMore: r.ok ? r.hasMore : false })
+  },
+
+  async loadMore() {
+    if (this.data.loading || !this.data.hasMore) return
+    this.setData({ loading: true })
+    const nextPage = this.data.page + 1
+    const r = await callCloud('listResources', { category: this.data.active, page: nextPage })
+    const more = (r.ok ? r.data : []).map(it => ({ ...it, _time: this.fmtTime(it.createdAt) }))
+    this.setData({
+      list: this.data.list.concat(more),
+      page: nextPage,
+      hasMore: r.ok ? r.hasMore : false,
+      loading: false,
+    })
   },
 
   fmtTime(ts) {
