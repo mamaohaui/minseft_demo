@@ -2,13 +2,13 @@
   <!-- 说明卡 -->
   <view class="tip-card">
     <view class="tip-title">⬇︎ 离线数据包</view>
-    <view class="tip-text">像地图包一样按省 / 市 / 县下载公共摊点数据。下载后地图才会显示对应区域的公共摊点；你的私有地点、收藏和关注的地点不受影响。</view>
+    <view class="tip-text">像地图包一样按省 / 市 / 县下载公共摊点数据，可整市一键下载或按区县单独下载。下载后地图才会显示对应区域的公共摊点；你的私有地点、收藏和关注的地点不受影响。</view>
   </view>
 
   <view wx:if="{{loading}}" class="loading">加载中…</view>
   <view wx:elif="{{tree.length === 0}}" class="empty">暂无可下载的公共数据</view>
 
-  <!-- 省 → 市 → 县三级折叠 -->
+  <!-- 省 → 市 → 县三级层级（默认展开） -->
   <block wx:for="{{tree}}" wx:key="province" wx:for-item="prov" wx:for-index="pi">
     <view class="section-title" hover-class="title-pressed" hover-stay-time="60" bindtap="toggleProvince" data-i="{{pi}}">
       <text>{{prov.province}}</text>
@@ -18,7 +18,18 @@
     <view wx:if="{{prov.expanded}}" class="group-card">
       <block wx:for="{{prov.cities}}" wx:key="city" wx:for-item="city" wx:for-index="ci">
         <view class="city-row {{ci > 0 ? 'row-divider' : ''}}" hover-class="row-pressed" hover-stay-time="60" bindtap="toggleCity" data-pi="{{pi}}" data-ci="{{ci}}">
-          <text class="city-name">{{city.city}}</text>
+          <view class="city-info">
+            <view class="city-name">{{city.city}}</view>
+            <view class="city-sub">{{city.districts.length}} 个区县 · {{city.total}} 个摊点{{city.downloadedCount ? ' · 已下载 ' + city.downloadedCount + '/' + city.districts.length : ''}}</view>
+          </view>
+          <view wx:if="{{!city.allDownloaded}}" class="dl-btn dl-mini" hover-class="btn-pressed" hover-stay-time="60"
+                catchtap="downloadCity" data-pi="{{pi}}" data-ci="{{ci}}">
+            全部下载
+          </view>
+          <view wx:else class="dl-btn dl-remove dl-mini" hover-class="btn-pressed" hover-stay-time="60"
+                catchtap="removeCity" data-pi="{{pi}}" data-ci="{{ci}}">
+            全部删除
+          </view>
           <text class="expand-icon">{{city.expanded ? '▾' : '▸'}}</text>
         </view>
 

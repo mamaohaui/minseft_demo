@@ -41,7 +41,8 @@ const toLngLat = (p) => {
 
 exports.main = async (event) => {
   const { province, city, district } = event
-  if (!province || !city || !district) {
+  // district 可省略：不传 = 整市下载（前端按区县分组写入数据包）
+  if (!province || !city) {
     return { ok: false, code: 'INVALID', message: '缺少区域参数' }
   }
 
@@ -57,8 +58,9 @@ exports.main = async (event) => {
     const p = toLngLat(s.current.location)
     if (!p) return
     const r = regionOf(p.lng, p.lat)
-    if (r.province === province && r.city === city && r.district === district) {
+    if (r.province === province && r.city === city && (!district || r.district === district)) {
       s.current.location = p // 归一化，前端直接可用
+      s.district = r.district // 整市下载时供前端按区县分组
       spots.push(s)
     }
   }))

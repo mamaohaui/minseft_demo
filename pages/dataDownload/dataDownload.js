@@ -6,7 +6,7 @@ const PKG_KEY = 'offlineRegionPackages'
 
 Page({
   data: {
-    tree: [],       // [{province, expanded, cities: [{city, expanded, districts: [{district, count, key, province, city, downloaded}]}]}]
+    tree: [],       // [{province, expanded, cities: [{city, expanded, total, districts: [{district, count, key, province, city, downloaded}]}]}]
     loading: true,
   },
 
@@ -20,8 +20,8 @@ Page({
       const pmap = {}
       ;(r.data || []).forEach(it => {
         const key = `${it.province}|${it.city}|${it.district}`
-        const p = pmap[it.province] = pmap[it.province] || { province: it.province, expanded: false, cities: {} }
-        const c = p.cities[it.city] = p.cities[it.city] || { city: it.city, expanded: false, districts: [] }
+        const p = pmap[it.province] = pmap[it.province] || { province: it.province, cities: {} }
+        const c = p.cities[it.city] = p.cities[it.city] || { city: it.city, districts: [] }
         c.districts.push({
           district: it.district,
           count: it.count,
@@ -30,10 +30,16 @@ Page({
           city: it.city,
         })
       })
+      // 层级树：省 / 市默认展开（层级一目了然），市行汇总区县数与摊点总数
       tree = Object.values(pmap).map(p => ({
         province: p.province,
-        expanded: false,
-        cities: Object.values(p.cities),
+        expanded: true,
+        cities: Object.values(p.cities).map(c => ({
+          city: c.city,
+          expanded: true,
+          districts: c.districts,
+          total: c.districts.reduce((s, d) => s + d.count, 0),
+        })),
       }))
     }
     this.setData({ tree, loading: false })
@@ -45,10 +51,16 @@ Page({
     const pkgs = wx.getStorageSync(PKG_KEY) || {}
     const tree = this.data.tree.map(p => ({
       ...p,
-      cities: p.cities.map(c => ({
-        ...c,
-        districts: c.districts.map(d => ({ ...d, downloaded: !!pkgs[d.key] })),
-      })),
+      cities: p.cities.map(c => {
+        const districts = c.districts.map(d => ({ ...d, downloaded: !!pkgs[d.key] }))
+        const dl = districts.filter(d => d.downloaded).length
+        return {
+          ...c,
+          districts,
+          downloadedCount: dl,
+          allDownloaded: districts.length > 0 && dl === districts.length,
+        }
+      }),
     }))
     this.setData({ tree })
   },
@@ -64,29 +76,99 @@ Page({
     this.setData({ [`tree[${pi}].cities[${ci}].expanded`]: !this.data.tree[pi].cities[ci].expanded })
   },
 
-  // 下载区域数据包：拉取该区县全部公共点位存入本地
-  async download(e) {
-    const { key, province, city, district } = e.currentTarget.dataset
-    wx.showLoading({ title: '下载中…', mask: true })
-    const r = await callCloud('getRegionSpots', { province, city, district })
-    wx.hideLoading()
-    if (!r.ok) {
-      wx.showToast({ title: r.message || '下载失败，请重试', icon: 'none' })
-      return
-    }
-    const pkgs = wx.getStorageSync(PKG_KEY) || {}
-    pkgs[key] = {
-      province, city, district,
-      count: (r.data || []).length,
-      downloadedAt: Date.now(),
-      spots: r.data || [],
-    }
-    wx.setStorageSync(PKG_KEY, pkgs)
-    wx.showToast({ title: `已下载 ${r.count} 个摊点`, icon: 'success' })
-    this.refreshFlags()
+  // 下载前确认弹窗（点「确定」才开始下载）
+  confirmDownload(title, content, onConfirm) {
+    wx.showModal({
+      title,
+      content,
+      confirmText: '确定',
+      cancelText: '取消',
+      success: (res) => { if (res.confirm) onConfirm() },
+    })
   },
 
-  // 删除数据包：删除后地图不再显示该区域公共摊点
+  // 下载完成后提示，可一键跳回地图查看公共图层
+  doneHint(count, name) {
+    wx.showModal({
+      title: '下载完成',
+      content: `「${name}」${count} 个公共摊点已下载，地图「公共摊点」图层将显示这些点位。`,
+      confirmText: '去地图',
+      cancelText: '留在这',
+      success: (res) => { if (res.confirm) wx.switchTab({ url: '/pages/map/map' }) },
+    })
+  },
+
+  // 下载单个区县数据包：拉取该区县全部公共点位存入本地
+  download(e) {
+    const { key, province, city, district } = e.currentTarget.dataset
+    this.confirmDownload(
+      '下载数据包',
+      `确定下载「${district}」的公共摊点数据吗？下载后地图公共图层将显示该区域摊点。`,
+      async () => {
+        wx.showLoading({ title: '下载中…', mask: true })
+        const r = await callCloud('getRegionSpots', { province, city, district })
+        wx.hideLoading()
+        if (!r.ok) {
+          wx.showToast({ title: r.message || '下载失败，请重试', icon: 'none' })
+          return
+        }
+        const pkgs = wx.getStorageSync(PKG_KEY) || {}
+        pkgs[key] = {
+          province, city, district,
+          count: (r.data || []).length,
+          downloadedAt: Date.now(),
+          spots: r.data || [],
+        }
+        wx.setStorageSync(PKG_KEY, pkgs)
+        this.refreshFlags()
+        this.doneHint(r.count || (r.data || []).length, district)
+      },
+    )
+  },
+
+  // 整市一键下载：一次云端调用拉取该市全部公共点位，前端按区县分组写入数据包
+  downloadCity(e) {
+    const { pi, ci } = e.currentTarget.dataset
+    const city = this.data.tree[pi].cities[ci]
+    const missing = city.districts.filter(d => !d.downloaded)
+    if (!missing.length) {
+      wx.showToast({ title: '该市数据已全部下载', icon: 'none' })
+      return
+    }
+    this.confirmDownload(
+      '下载整市数据',
+      `确定下载「${city.city}」全部 ${city.districts.length} 个区县（共 ${city.total} 个摊点）的数据包吗？`,
+      async () => {
+        wx.showLoading({ title: '下载中…', mask: true })
+        const r = await callCloud('getRegionSpots', { province: city.province, city: city.city })
+        wx.hideLoading()
+        if (!r.ok) {
+          wx.showToast({ title: r.message || '下载失败，请重试', icon: 'none' })
+          return
+        }
+        // 按区县分组，逐区县写入本地数据包（与单个下载的存储结构一致）
+        const groups = {}
+        ;(r.data || []).forEach(s => {
+          const d = s.district || '其他'
+          ;(groups[d] = groups[d] || []).push(s)
+        })
+        const pkgs = wx.getStorageSync(PKG_KEY) || {}
+        Object.keys(groups).forEach(d => {
+          pkgs[`${city.province}|${city.city}|${d}`] = {
+            province: city.province, city: city.city, district: d,
+            count: groups[d].length,
+            downloadedAt: Date.now(),
+            spots: groups[d],
+          }
+        })
+        wx.setStorageSync(PKG_KEY, pkgs)
+        this.refreshFlags()
+        this.doneHint((r.data || []).length, city.city)
+      },
+    )
+  },
+
+  // 删除单个区县数据包：删除后地图不再显示该区域公共摊点
   remove(e) {
     const key = e.currentTarget.dataset.key
     wx.showModal({
@@ -97,6 +179,24 @@ Page({
         if (!res.confirm) return
         const pkgs = wx.getStorageSync(PKG_KEY) || {}
         delete pkgs[key]
+        wx.setStorageSync(PKG_KEY, pkgs)
+        this.refreshFlags()
+      },
+    })
+  },
+
+  // 删除整市数据包
+  removeCity(e) {
+    const { pi, ci } = e.currentTarget.dataset
+    const city = this.data.tree[pi].cities[ci]
+    wx.showModal({
+      title: '删除整市数据包',
+      content: `确定删除「${city.city}」已下载的全部数据包吗？删除后地图不再显示该市公共摊点。`,
+      confirmColor: '#ff3b30',
+      success: (res) => {
+        if (!res.confirm) return
+        const pkgs = wx.getStorageSync(PKG_KEY) || {}
+        city.districts.forEach(d => { delete pkgs[d.key] })
         wx.setStorageSync(PKG_KEY, pkgs)
         this.refreshFlags()
       },

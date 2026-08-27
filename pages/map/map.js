@@ -72,8 +72,10 @@ Page({
 
   // 「我的发布/管理员审核-查看」跳转过来：globalData 传入目标点，居中并强制显示标志
   onShow() {
-    // 数据包可能刚下载/删除，先重读本地（收藏+关注随后静默刷新并重建 markers）
+    // 数据包可能刚下载/删除，先重读本地并立即重建 markers
+    // （收藏+关注随后静默刷新；即使那些云调用失败，公共图层也即时生效）
     this.loadOffline()
+    this.applyLayers()
     // 每次回地图页静默刷新收藏+关注（详情页收藏/关注/取关后图层即时生效）
     this.refreshFavs()
     this.refreshFollowed()
