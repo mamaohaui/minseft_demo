@@ -42,8 +42,6 @@ Page({
     longitude: DEFAULT_REGION.lng,
     centerLat: DEFAULT_REGION.lat,  // 地图当前中心（regionchange 记录，供刷新用，不参与渲染）
     centerLng: DEFAULT_REGION.lng,
-    regionName: DEFAULT_REGION.name,
-    regionNames: REGIONS.map(r => r.name),
     markers: [],
     spots: [],
     loaded: false,    // 首次加载完成（控制空态提示闪现）
@@ -135,21 +133,6 @@ Page({
         this.loadNearby(lng, lat, spot)
       },
     })
-  },
-
-  // 选择地区：以该地区中心点加载周边摊点（公共摊点基础显示入口）
-  onPickRegion(e) {
-    const region = REGIONS[Number(e.detail.value)]
-    if (!region) return
-    this._focusSpot = null // 选地区退出"查看目标"模式
-    this.setData({
-      regionName: region.name,
-      latitude: region.lat,
-      longitude: region.lng,
-      centerLat: region.lat,
-      centerLng: region.lng,
-    })
-    this.loadNearby(region.lng, region.lat)
   },
 
   async loadNearby(lng, lat, focusSpot) {
