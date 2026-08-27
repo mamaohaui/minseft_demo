@@ -173,11 +173,28 @@ Page({
   },
 
   // 诊断报告弹窗：明确告诉用户云端哪个云函数有问题、该怎么做
-  showDiagnosis(lines) {
+  showDiagnosis(lines, rep) {
+    // 根据实际故障精简提示：基础库已有数据且 seed 正常时，只需部署 getRegionSpots
+    const seedOk = rep && rep.seed && rep.seed.ok
+    const baseHasData = rep && rep.baseTotal > 0
+    let fixLines = []
+    if (!seedOk) {
+      fixLines.push('① seedSpots（基础数据导入）')
+      fixLines.push('② getRegionSpots（区域数据拉取）')
+      fixLines.push('③ listRegionPackages（目录统计）')
+    } else if (baseHasData) {
+      fixLines.push('① getRegionSpots（区域数据拉取）')
+    } else {
+      fixLines.push('① seedSpots（基础数据导入）')
+      fixLines.push('② getRegionSpots（区域数据拉取）')
+      fixLines.push('③ listRegionPackages（目录统计）')
+    }
+
     wx.showModal({
       title: '下载失败 · 诊断结果',
       content: lines.join('；') +
-        '。\n\n解决办法：在微信开发者工具左侧展开 cloudfunctions 目录，右键以下云函数选择「上传并部署：云端安装依赖」——\n① seedSpots（基础数据导入）\n② getRegionSpots（区域数据拉取）\n③ listRegionPackages（目录统计）\n部署完成后回到本页重试即可。',
+        '。\n\n解决办法：在微信开发者工具左侧展开 cloudfunctions 目录，右键以下云函数选择「上传并部署：云端安装依赖」——\n' +
+        fixLines.join('\n') + '\n部署完成后回到本页重试即可。',
       confirmText: '我知道了',
       showCancel: false,
     })
@@ -206,7 +223,7 @@ Page({
             if (r.code === 'NOT_DEPLOYED' && rep.seed && rep.seed.code === 'NOT_DEPLOYED') {
               wx.showToast({ title: '云函数 getRegionSpots / seedSpots 未部署', icon: 'none', duration: 3000 })
             } else {
-              this.showDiagnosis(rep.lines)
+              this.showDiagnosis(rep.lines, rep)
             }
             return
           }
@@ -301,7 +318,7 @@ Page({
             } else if (lastCode === 'NETWORK') {
               wx.showToast({ title: '网络异常，请稍后重试', icon: 'none' })
             } else {
-              this.showDiagnosis(rep.lines)
+              this.showDiagnosis(rep.lines, rep)
             }
             return
           }
