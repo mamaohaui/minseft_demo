@@ -46,8 +46,9 @@ exports.main = async (event) => {
     return { ok: false, code: 'INVALID', message: '缺少区域参数' }
   }
 
+  // 仅下载基础库数据（source='base'，程序收集整理的公共摆摊数据），不含用户发布点位
   const res = await db.collection('spots')
-    .where({ visibility: 'public' })
+    .where({ visibility: 'public', source: 'base' })
     .limit(1000)
     .get()
     .catch(() => null)

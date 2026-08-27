@@ -42,5 +42,5 @@ exports.main = async (event) => {
     }
     return s
   })
-  return { ok: true, data: all }
+  return { ok: true, data: all, openid: OPENID }
 }

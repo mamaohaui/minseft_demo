@@ -38,15 +38,15 @@
   <view class="layer-panel" catchtap="noop">
     <view class="layer-panel-title">显示图层</view>
     <view class="layer-option" data-key="private" bindtap="toggleLayer">
-      <text class="layer-name">我的私有</text>
+      <text class="layer-name">我的发布</text>
       <view class="layer-switch {{layers.private ? 'switch-on' : ''}}"><view class="layer-dot"></view></view>
     </view>
     <view class="layer-option" data-key="followed" bindtap="toggleLayer">
-      <text class="layer-name">关注分享</text>
+      <text class="layer-name">收藏 / 关注</text>
       <view class="layer-switch {{layers.followed ? 'switch-on' : ''}}"><view class="layer-dot"></view></view>
     </view>
     <view class="layer-option" data-key="public" bindtap="toggleLayer">
-      <text class="layer-name">公共摊点</text>
+      <text class="layer-name">公共摊点（基础库）</text>
       <view class="layer-switch {{layers.public ? 'switch-on' : ''}}"><view class="layer-dot"></view></view>
     </view>
   </view>

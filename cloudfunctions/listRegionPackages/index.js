@@ -42,9 +42,11 @@ const toLngLat = (p) => {
 }
 
 exports.main = async () => {
-  // 全量公共点位（current 为空 = 未过审，天然排除）；spots 集合查询 catch 兜底
+  // 仅统计基础库数据（source='base'，即程序收集整理的公共摆摊数据）
+  // 用户自己发布的公开点位不属于"公共数据下载"范围（我的发布/收藏/关注另行展示）
+  // current 为空 = 未过审，天然排除；spots 集合查询 catch 兜底
   const res = await db.collection('spots')
-    .where({ visibility: 'public' })
+    .where({ visibility: 'public', source: 'base' })
     .limit(1000)
     .get()
     .catch(() => null)

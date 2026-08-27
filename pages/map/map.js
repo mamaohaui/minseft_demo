@@ -46,7 +46,7 @@ Page({
     spots: [],
     loaded: false,    // 首次加载完成（控制空态提示闪现）
     loading: false,   // 防重复刷新
-    // 图层开关：我的私有（第一）/ 关注分享（收藏+关注的人发布）/ 公共摊点（默认全开）
+    // 图层开关：我的发布（第一）/ 收藏+关注 / 公共摊点（基础库，需下载数据包，默认全开）
     layers: { private: true, followed: true, public: true },
     layerPanelOpen: false,
   },
@@ -147,6 +147,7 @@ Page({
     }
     // 全量缓存：图层开关切换时本地过滤即时生效，不重新请求（坐标本地归一化兜底）
     this._allSpots = (r.data || []).map(normalizeSpot).filter(Boolean)
+    this._myOpenid = r.openid || this._myOpenid // 供图层归类：识别"我发布的"点位
     // 焦点以「完成时刻」为准：即使本查询早于 onShow 发出（慢查询竞态），
     // 回来重建 markers 时也带上目标标志，不会被冲掉
     this.applyLayers(focusSpot || this._focusSpot)
@@ -184,12 +185,17 @@ Page({
     ;(this._offlineSpots || []).forEach(s => { cand[s._id] = s })
     ;(this._favSpots || []).forEach(s => { cand[s._id] = s })
     ;(this._followedSpots || []).forEach(s => { cand[s._id] = s })
-    // 按优先级归类：我的私有 > 关注分享（收藏 / 关注的人发布）> 公共摊点
-    // 公共摊点仅在所属区域的数据包已下载时显示（未下载区域的公共点位不显示）
+    // 三类图层严格区分（数据来源互不重叠）：
+    // ① 我的私有：我发布的点位（私有/公开皆显示，无需下载数据包）
+    // ② 关注分享：我收藏的 + 我关注的人发布的点位
+    // ③ 公共摊点：仅程序收集整理的基础数据（source='base'），且需已下载对应区域数据包
+    // 其他陌生用户发布的公开点位不在地图直接展示（可通过搜索找到后收藏/关注）
     let spots = Object.values(cand).filter(s => {
-      if (s.visibility === 'private') return L.private
+      if (this._myOpenid && s.creatorOpenid === this._myOpenid) return L.private
+      if (s.visibility === 'private') return false // 他人私有点位本就不会返回，防御
       if (favIds.includes(s._id) || followeeIds.includes(s.creatorOpenid)) return L.followed
-      return L.public && !!offlineKeys[regionKeyOf(s)]
+      if (s.source === 'base') return L.public && !!offlineKeys[regionKeyOf(s)]
+      return false
     })
     const f = focus || this._focusSpot
     if (f) spots = spots.filter(s => s._id !== f._id)
