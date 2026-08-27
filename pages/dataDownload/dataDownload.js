@@ -156,7 +156,9 @@ Page({
     )
   },
 
-  // 整市一键下载：一次云端调用拉取该市全部公共点位，前端按区县分组写入数据包
+  // 整市一键下载：全部下级区县的数据包都下载
+  // 优先一次云端调用整市拉取；若云端还是旧版 getRegionSpots（不认省+市、报「缺少区域参数」），
+  // 自动降级为逐个区县下载，效果一致（各区县数据包全部落地）
   downloadCity(e) {
     const { pi, ci } = e.currentTarget.dataset
     const city = this.data.tree[pi].cities[ci]
@@ -170,18 +172,34 @@ Page({
       `确定下载「${city.city}」全部 ${city.districts.length} 个区县（共 ${city.total} 个摊点）的数据包吗？`,
       async () => {
         wx.showLoading({ title: '下载中…', mask: true })
+        let groups = {}
+        let total = 0
+
+        // 1) 尝试整市一次拉取（新版云函数）
         const r = await callCloud('getRegionSpots', { province: city.province, city: city.city })
+        if (r.ok) {
+          total = (r.data || []).length
+          ;(r.data || []).forEach(s => {
+            const d = s.district || '其他'
+            ;(groups[d] = groups[d] || []).push(s)
+          })
+        } else if (r.code === 'INVALID') {
+          // 2) 云端为旧版：逐区县下载（全部下级区域都下载）
+          for (const d of city.districts) {
+            const rd = await callCloud('getRegionSpots', { province: city.province, city: city.city, district: d.district })
+            if (rd.ok) {
+              total += (rd.data || []).length
+              groups[d.district] = rd.data || []
+            }
+          }
+        }
+
         wx.hideLoading()
-        if (!r.ok) {
-          wx.showToast({ title: r.message || '下载失败，请重试', icon: 'none' })
+        if (!Object.keys(groups).length) {
+          wx.showToast({ title: '下载失败，请重试', icon: 'none' })
           return
         }
-        // 按区县分组，逐区县写入本地数据包（与单个下载的存储结构一致）
-        const groups = {}
-        ;(r.data || []).forEach(s => {
-          const d = s.district || '其他'
-          ;(groups[d] = groups[d] || []).push(s)
-        })
+        // 按区县逐包写入本地（与单个下载的存储结构一致）
         const pkgs = wx.getStorageSync(PKG_KEY) || {}
         Object.keys(groups).forEach(d => {
           pkgs[`${city.province}|${city.city}|${d}`] = {
@@ -193,7 +211,7 @@ Page({
         })
         wx.setStorageSync(PKG_KEY, pkgs)
         this.refreshFlags()
-        this.doneHint((r.data || []).length, city.city)
+        this.doneHint(total, city.city)
       },
     )
   },
