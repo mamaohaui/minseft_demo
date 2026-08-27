@@ -11,6 +11,7 @@
   markers="{{markers}}"
   show-location
   bindmarkertap="onMarkerTap"
+  bindcallouttap="onMarkerTap"
   bindregionchange="onRegionChange"
 />
 
