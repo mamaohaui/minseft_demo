@@ -4,13 +4,17 @@ const { callCloud } = require('../../utils/cloud')
 const CATEGORIES = ['全部', '货源供应', '摊位转让', '设备租赁', '合伙招募', '政策资讯', '其他']
 
 Page({
-  data: { categories: CATEGORIES, active: '全部', list: [], loading: false, page: 0, hasMore: true },
+  data: { categories: CATEGORIES, active: '全部', list: [], loading: false, page: 0, hasMore: true, notDeployed: false },
 
   onShow() { this.load() },
 
   async load() {
-    this.setData({ loading: true, page: 0, hasMore: true })
-    const r = await callCloud('listResources', { category: this.data.active, page: 0 })
+    this.setData({ loading: true, page: 0, hasMore: true, notDeployed: false })
+    const r = await callCloud('listResources', { category: this.data.active, page: 0 }, { silent: true })
+    if (!r.ok && r.code === 'NOT_DEPLOYED') {
+      this.setData({ list: [], loading: false, hasMore: false, notDeployed: true })
+      return
+    }
     const list = (r.ok ? r.data : []).map(it => ({ ...it, _time: this.fmtTime(it.createdAt) }))
     this.setData({ list, loading: false, hasMore: r.ok ? r.hasMore : false })
   },

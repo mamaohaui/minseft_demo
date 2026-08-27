@@ -13,6 +13,7 @@
 
   <!-- 列表 -->
   <view wx:if="{{loading && list.length === 0}}" class="tip">加载中…</view>
+  <view wx:elif="{{notDeployed}}" class="tip">云函数 listResources 未部署，请在开发者工具左侧展开 cloudfunctions，右键 listResources 选择「上传并部署：云端安装依赖」后重进本页</view>
   <view wx:elif="{{list.length === 0}}" class="tip">该分类下暂无资源信息</view>
 
   <scroll-view wx:else class="list-scroll" scroll-y bindscrolltolower="loadMore" lower-threshold="100">
