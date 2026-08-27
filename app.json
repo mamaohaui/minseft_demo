@@ -14,11 +14,13 @@
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "摆摊神器",
     "navigationBarBackgroundColor": "#ffffff",
-    "backgroundColor": "#f5f5f5"
+    "backgroundColor": "#f2f2f7"
   },
   "tabBar": {
-    "color": "#999999",
-    "selectedColor": "#07c160",
+    "color": "#8e8e93",
+    "selectedColor": "#34c759",
+    "backgroundColor": "#f8f8f8",
+    "borderStyle": "black",
     "list": [
       { "pagePath": "pages/map/map", "text": "地图" },
       { "pagePath": "pages/resources/resources", "text": "资源拓展" },

@@ -1,41 +1,89 @@
-.search-bar { display: flex; padding: 20rpx; gap: 16rpx; background: #fff; }
-.search-bar input { flex: 1; border: 1rpx solid #ddd; border-radius: 8rpx; padding: 16rpx; }
+/* ===== 搜索框区（iOS 大圆角灰填充输入框） ===== */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 20rpx 32rpx;
+  background: #fff;
+}
+.field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  background: #f2f2f7;
+  border-radius: 22rpx;
+  padding: 0 24rpx;
+  height: 76rpx;
+}
+.field input { flex: 1; font-size: 28rpx; color: #1c1c1e; }
+.field-icon { font-size: 26rpx; line-height: 1; opacity: 0.55; }
+.search-btn { font-size: 28rpx; color: #007aff; font-weight: 500; flex-shrink: 0; }
+.link-pressed { opacity: 0.4; }
 
-/* 筛选区 */
+/* ===== 筛选区（分组卡） ===== */
 .filter-block {
   background: #fff;
   margin-top: 2rpx;
-  padding: 8rpx 20rpx 20rpx;
+  padding: 16rpx 32rpx 28rpx;
 }
-.filter-row { margin-top: 16rpx; }
-.filter-label { font-size: 24rpx; color: #999; margin-bottom: 12rpx; }
-.chips { display: flex; flex-wrap: wrap; gap: 14rpx; }
-.chip {
+.filter-row { margin-top: 20rpx; }
+.filter-label {
   font-size: 24rpx;
-  color: #555;
-  background: #f5f5f5;
-  border: 1rpx solid #eee;
-  border-radius: 28rpx;
-  padding: 8rpx 26rpx;
+  color: #8e8e93;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+  margin-bottom: 14rpx;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 16rpx; }
+/* iOS 筛选 chips：未选灰底、选中实心绿 */
+.chip {
+  font-size: 25rpx;
+  color: #3c3c43;
+  background: rgba(120,120,128,0.12);
+  border-radius: 32rpx;
+  padding: 10rpx 28rpx;
+  transition: all 0.15s ease;
 }
 .chip-on {
-  color: #07c160;
-  background: #e8f7ef;
-  border-color: #07c160;
+  color: #fff;
+  background: #34c759;
   font-weight: 600;
 }
-.creator-input {
-  border: 1rpx solid #ddd;
-  border-radius: 8rpx;
-  padding: 14rpx 16rpx;
-  font-size: 26rpx;
+.chip-pressed { opacity: 0.6; }
+.creator-field {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  background: #f2f2f7;
+  border-radius: 22rpx;
+  padding: 0 24rpx;
+  height: 76rpx;
 }
-.reset-line { margin-top: 20rpx; text-align: center; font-size: 24rpx; color: #999; }
+.creator-field input { flex: 1; font-size: 27rpx; color: #1c1c1e; }
+.reset-line { margin-top: 24rpx; text-align: center; font-size: 25rpx; color: #8e8e93; }
 
-/* 结果列表 */
-.item { padding: 24rpx; border-bottom: 1rpx solid #eee; background: #fff; }
-.t { font-size: 30rpx; font-weight: 600; }
-.s { color: #999; font-size: 24rpx; margin-top: 8rpx; }
-.creator { color: #07c160; font-size: 24rpx; margin-top: 8rpx; }
-.empty { text-align: center; color: #999; padding: 80rpx 0; }
-.hint { text-align: center; color: #999; font-size: 24rpx; padding: 16rpx 0; }
+/* ===== 结果列表（iOS 分组卡） ===== */
+.result-card {
+  margin: 24rpx 32rpx;
+  background: #fff;
+  border-radius: 28rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 32rpx;
+}
+.item-divider { border-top: 1rpx solid rgba(60,60,67,0.12); }
+.item-main { display: flex; flex-direction: column; gap: 8rpx; flex: 1; min-width: 0; }
+.t { font-size: 30rpx; font-weight: 600; color: #1c1c1e; }
+.s { color: #8e8e93; font-size: 24rpx; }
+.creator { color: #007aff; font-size: 24rpx; }
+.arrow { font-size: 40rpx; color: #c7c7cc; line-height: 1; font-weight: 300; margin-left: 16rpx; }
+.row-pressed { background: rgba(60,60,67,0.06); }
+
+.empty { text-align: center; color: #8e8e93; padding: 96rpx 0; font-size: 27rpx; }
+.hint { text-align: center; color: #8e8e93; font-size: 24rpx; padding: 20rpx 0; }

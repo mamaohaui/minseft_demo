@@ -1,10 +1,74 @@
-.form { padding: 24rpx; }
-.form input, .form picker view, .loc {
-  border: 1rpx solid #ddd;
-  border-radius: 8rpx;
-  padding: 20rpx;
-  margin: 16rpx 0;
-  font-size: 28rpx;
+.page { padding: 24rpx 32rpx 64rpx; }
+
+/* ===== 表单分组卡 ===== */
+.form-card {
+  background: #fff;
+  border-radius: 28rpx;
+  padding: 8rpx 32rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.06);
 }
-.loc { color: #07c160; }
-.submit { background: #07c160; color: #fff; margin-top: 30rpx; }
+.field { padding: 28rpx 0; }
+.field-divider { border-top: 1rpx solid rgba(60,60,67,0.12); }
+.label { font-size: 26rpx; font-weight: 600; color: #8e8e93; letter-spacing: 1rpx; margin-bottom: 16rpx; }
+.req { color: #ff3b30; }
+
+/* iOS 灰填充输入框 */
+.input {
+  background: #f2f2f7;
+  border-radius: 18rpx;
+  padding: 20rpx 24rpx;
+  font-size: 29rpx;
+  color: #1c1c1e;
+}
+
+/* 选择行（iOS 设置样式：值 + 箭头） */
+.picker-row {
+  background: #f2f2f7;
+  border-radius: 18rpx;
+  padding: 20rpx 24rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.picker-value { font-size: 29rpx; color: #1c1c1e; }
+.picker-arrow { color: #c7c7cc; font-size: 36rpx; line-height: 1; font-weight: 300; }
+
+/* 地图选点行 */
+.loc {
+  background: rgba(52,199,89,0.10);
+  border: 1rpx dashed rgba(52,199,89,0.55);
+  border-radius: 18rpx;
+  padding: 20rpx 24rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.12s ease;
+}
+.loc-on {
+  background: rgba(52,199,89,0.16);
+  border-style: solid;
+}
+.loc-text { font-size: 27rpx; color: #248a3d; }
+.row-pressed { background: rgba(52,199,89,0.22); }
+
+/* ===== 提交按钮（iOS 全宽胶囊） ===== */
+.submit-btn {
+  margin-top: 40rpx;
+  text-align: center;
+  font-size: 31rpx;
+  font-weight: 600;
+  letter-spacing: 2rpx;
+  color: #fff;
+  background: #34c759;
+  border-radius: 28rpx;
+  padding: 26rpx 0;
+  box-shadow: 0 8rpx 24rpx rgba(52,199,89,0.4);
+  transition: all 0.12s ease;
+}
+.submit-pressed { background: #2db350; transform: scale(0.98); }
+.submit-hint {
+  margin-top: 20rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #c7c7cc;
+}

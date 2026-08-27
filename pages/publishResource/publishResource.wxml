@@ -11,14 +11,17 @@
       />
     </view>
 
-    <view class="field">
+    <view class="field field-divider">
       <view class="label">分类 <text class="req">*</text></view>
       <picker range="{{categories}}" value="{{categoryIndex}}" bindchange="onPick">
-        <view class="picker">{{categories[categoryIndex]}} <text class="picker-arrow">›</text></view>
+        <view class="picker-row">
+          <text class="picker-value">{{categories[categoryIndex]}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
       </picker>
     </view>
 
-    <view class="field">
+    <view class="field field-divider">
       <view class="label">详细说明 <text class="req">*</text></view>
       <textarea
         class="textarea"
@@ -30,7 +33,7 @@
       />
     </view>
 
-    <view class="field">
+    <view class="field field-divider">
       <view class="label">联系方式 <text class="req">*</text></view>
       <input
         class="input"
@@ -42,7 +45,8 @@
     </view>
   </view>
 
-  <button class="submit-btn" type="primary" bindtap="submit" disabled="{{submitting}}">
+  <view class="submit-btn" hover-class="submit-pressed" hover-stay-time="60" bindtap="submit">
     {{submitting ? '发布中…' : '发布资源'}}
-  </button>
+  </view>
+  <view class="submit-hint">资源信息直接公开，无需审核</view>
 </view>

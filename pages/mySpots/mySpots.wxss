@@ -1,12 +1,12 @@
-.container { padding: 24rpx; }
-.empty { color: #999; font-size: 26rpx; text-align: center; padding: 80rpx 0; }
+.container { padding: 24rpx 32rpx 48rpx; }
+.empty { color: #8e8e93; font-size: 27rpx; text-align: center; padding: 120rpx 0; }
 
 .spot-item {
   background: #fff;
-  border-radius: 16rpx;
-  padding: 24rpx;
-  margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+  border-radius: 28rpx;
+  padding: 30rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.06);
 }
 
 /* 主行：名称 + 三个操作按钮同行 */
@@ -18,7 +18,7 @@
 .t {
   font-size: 30rpx;
   font-weight: 600;
-  color: #333;
+  color: #1c1c1e;
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -27,28 +27,39 @@
   margin-right: 16rpx;
 }
 .acts { display: flex; align-items: center; flex-shrink: 0; }
+/* iOS 色调浅底胶囊 */
 .act {
-  font-size: 26rpx;
-  padding: 8rpx 22rpx;
-  border-radius: 24rpx;
+  font-size: 25rpx;
+  font-weight: 500;
+  padding: 10rpx 24rpx;
+  border-radius: 28rpx;
   margin-left: 12rpx;
+  transition: opacity 0.12s ease;
 }
-.act-view { background: #e8f3ff; color: #409eff; }
-.act-edit { background: #e8f8ef; color: #07c160; }
-.act-del { background: #fdeceb; color: #e64340; }
+.act-pressed { opacity: 0.5; }
+.act-view { background: rgba(0,122,255,0.12); color: #007aff; }
+.act-edit { background: rgba(52,199,89,0.14); color: #248a3d; }
+.act-del { background: rgba(255,59,48,0.12); color: #ff3b30; }
 
 /* 次行：状态标签 + 可见性 */
 .meta-row {
   display: flex;
   align-items: center;
-  margin-top: 14rpx;
+  margin-top: 18rpx;
   gap: 12rpx;
 }
-.badge { font-size: 22rpx; padding: 4rpx 16rpx; border-radius: 20rpx; }
-.badge-approved { background: #e8f8ef; color: #07c160; }
-.badge-pending { background: #fff7e6; color: #e6a23c; }
-.badge-updating { background: #e8f3ff; color: #409eff; }
-.badge-rejected { background: #fdeceb; color: #e64340; }
-.vis { font-size: 24rpx; color: #999; }
+.badge { font-size: 22rpx; font-weight: 500; padding: 4rpx 16rpx; border-radius: 12rpx; }
+.badge-approved { background: rgba(52,199,89,0.14); color: #248a3d; }
+.badge-pending { background: rgba(255,149,0,0.14); color: #c93400; }
+.badge-updating { background: rgba(0,122,255,0.12); color: #007aff; }
+.badge-rejected { background: rgba(255,59,48,0.12); color: #ff3b30; }
+.vis { font-size: 24rpx; color: #8e8e93; }
 
-.reject-reason { font-size: 24rpx; color: #e64340; margin-top: 10rpx; }
+.reject-reason {
+  font-size: 24rpx;
+  color: #ff3b30;
+  margin-top: 14rpx;
+  padding: 14rpx 20rpx;
+  background: rgba(255,59,48,0.08);
+  border-radius: 14rpx;
+}

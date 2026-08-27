@@ -1,29 +1,62 @@
-<view class="form">
-  <input data-key="title" value="{{form.title}}" placeholder="标题/位置描述" bindinput="onInput" />
+<view class="page">
+  <view class="form-card">
+    <view class="field">
+      <view class="label">标题 / 位置描述 <text class="req">*</text></view>
+      <input class="input" data-key="title" value="{{form.title}}" placeholder="例如：春熙路地铁站B口早市" bindinput="onInput" />
+    </view>
 
-  <picker data-key="category" range="{{category}}" bindchange="onPicker">
-    <view>品类：{{form.category}}</view>
-  </picker>
+    <view class="field field-divider">
+      <view class="label">品类</view>
+      <picker data-key="category" range="{{category}}" bindchange="onPicker">
+        <view class="picker-row"><text class="picker-value">{{form.category}}</text><text class="picker-arrow">›</text></view>
+      </picker>
+    </view>
 
-  <picker data-key="timeSlot" range="{{timeSlot}}" bindchange="onPicker">
-    <view>时段：{{form.timeSlot}}</view>
-  </picker>
+    <view class="field field-divider">
+      <view class="label">出摊时段</view>
+      <picker data-key="timeSlot" range="{{timeSlot}}" bindchange="onPicker">
+        <view class="picker-row"><text class="picker-value">{{form.timeSlot}}</text><text class="picker-arrow">›</text></view>
+      </picker>
+    </view>
 
-  <input data-key="positionReq" value="{{form.positionReq}}" placeholder="地摊位置要求" bindinput="onInput" />
-  <input data-key="mgmtReq" value="{{form.mgmtReq}}" placeholder="城管/管理要求" bindinput="onInput" />
+    <view class="field field-divider">
+      <view class="label">地摊位置要求</view>
+      <input class="input" data-key="positionReq" value="{{form.positionReq}}" placeholder="如：人行道内侧 2 米内" bindinput="onInput" />
+    </view>
 
-  <picker data-key="feeType" range="{{feeType}}" bindchange="onPicker">
-    <view>费用类型：{{form.feeType}}</view>
-  </picker>
-  <input data-key="feeAmount" value="{{form.feeAmount}}" type="number" placeholder="费用金额（元，免费填0）" bindinput="onFeeAmount" />
+    <view class="field field-divider">
+      <view class="label">城管 / 管理要求</view>
+      <input class="input" data-key="mgmtReq" value="{{form.mgmtReq}}" placeholder="如：19:00 后可摆" bindinput="onInput" />
+    </view>
 
-  <picker data-key="visibility" range="{{visibilityOptions}}" range-key="label" bindchange="onPicker">
-    <view>可见性：{{visibilityLabel}}</view>
-  </picker>
+    <view class="field field-divider">
+      <view class="label">费用类型</view>
+      <picker data-key="feeType" range="{{feeType}}" bindchange="onPicker">
+        <view class="picker-row"><text class="picker-value">{{form.feeType}}</text><text class="picker-arrow">›</text></view>
+      </picker>
+    </view>
 
-  <view class="loc" bindtap="chooseLocation">
-    {{location ? '坐标已选：' + location.lat + ',' + location.lng : '点此在地图上选坐标'}}
+    <view class="field field-divider">
+      <view class="label">费用金额（元，免费填 0）</view>
+      <input class="input" data-key="feeAmount" value="{{form.feeAmount}}" type="number" placeholder="0" bindinput="onFeeAmount" />
+    </view>
+
+    <view class="field field-divider">
+      <view class="label">可见性</view>
+      <picker data-key="visibility" range="{{visibilityOptions}}" range-key="label" bindchange="onPicker">
+        <view class="picker-row"><text class="picker-value">{{visibilityLabel}}</text><text class="picker-arrow">›</text></view>
+      </picker>
+    </view>
+
+    <view class="field field-divider">
+      <view class="label">地图选点 <text class="req">*</text></view>
+      <view class="loc {{location ? 'loc-on' : ''}}" hover-class="row-pressed" hover-stay-time="60" bindtap="chooseLocation">
+        <text class="loc-text">{{location ? '坐标已选：' + location.lat + ',' + location.lng : '点此在地图上选择坐标'}}</text>
+        <text class="picker-arrow">›</text>
+      </view>
+    </view>
   </view>
 
-  <button class="submit" bindtap="submit">提交</button>
+  <view class="submit-btn" hover-class="submit-pressed" hover-stay-time="60" bindtap="submit">提交审核</view>
+  <view class="submit-hint">提交后由管理员审核，通过后将在地图显示</view>
 </view>

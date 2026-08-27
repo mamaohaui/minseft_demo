@@ -1,6 +1,6 @@
 <view class="page">
   <!-- 用户卡：点击设置发布者昵称 -->
-  <view class="user-card" bindtap="editNickname">
+  <view class="user-card" hover-class="card-pressed" hover-stay-time="80" bindtap="editNickname">
     <view class="avatar">摊</view>
     <view class="user-info">
       <view class="user-name">
@@ -14,18 +14,18 @@
     </view>
   </view>
 
-  <!-- 发布管理 -->
-  <view class="section">
-    <view class="section-title">发布管理</view>
-    <view class="entry-row" bindtap="goMySpots">
+  <!-- 发布管理：iOS 分组列表（同一卡片 + 发丝线分隔） -->
+  <view class="section-title">发布管理</view>
+  <view class="group-card">
+    <view class="entry-row" hover-class="row-pressed" hover-stay-time="80" bindtap="goMySpots">
       <view class="entry-left">
         <view class="entry-name">我的发布</view>
         <view class="entry-sub" wx:if="{{mySpots.length}}">共 {{mySpots.length}} 条记录</view>
-        <view class="entry-sub" wx:else>暂无发布，去地图右下角发布第一个摊点</view>
+        <view class="entry-sub" wx:else>暂无发布，去地图发布第一个摊点</view>
       </view>
       <text class="arrow">›</text>
     </view>
-    <view wx:if="{{user && user.isAdmin}}" class="entry-row" bindtap="goAdmin">
+    <view wx:if="{{user && user.isAdmin}}" class="entry-row row-divider" hover-class="row-pressed" hover-stay-time="80" bindtap="goAdmin">
       <view class="entry-left">
         <view class="entry-name">管理员审核</view>
         <view class="entry-sub">审核摊友提交的地点申请</view>
@@ -35,13 +35,16 @@
   </view>
 
   <!-- 我的收藏 -->
-  <view class="section">
-    <view class="section-title">
-      我的收藏
-      <text class="count" wx:if="{{favorites.length}}">{{favorites.length}}</text>
-    </view>
+  <view class="section-title">
+    我的收藏
+    <text class="count" wx:if="{{favorites.length}}">{{favorites.length}}</text>
+  </view>
+  <view class="group-card">
     <view wx:if="{{favorites.length === 0}}" class="empty-card">暂无收藏，去地图逛逛吧</view>
-    <view wx:for="{{favorites}}" wx:key="_id" class="fav-card" data-id="{{item._id}}" bindtap="goDetail">
+    <view wx:for="{{favorites}}" wx:key="_id"
+          class="fav-card {{index > 0 ? 'row-divider' : ''}}"
+          hover-class="row-pressed" hover-stay-time="80"
+          data-id="{{item._id}}" bindtap="goDetail">
       <view class="fav-main">
         <view class="fav-title">{{item.current ? item.current.title : '（待公开）'}}</view>
         <view class="fav-sub">{{item.current ? item.current.category : '—'}}</view>

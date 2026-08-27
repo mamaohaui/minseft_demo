@@ -9,9 +9,12 @@
     <view class="spot-row">
       <text class="t">{{item._title}}</text>
       <view class="acts">
-        <text class="act act-view" data-id="{{item._id}}" catchtap="viewOnMap">查看</text>
-        <text class="act act-edit" data-id="{{item._id}}" catchtap="goEdit">{{item._status === 'approved' && !item.hasPendingUpdate ? '编辑' : '重提'}}</text>
-        <text class="act act-del" data-id="{{item._id}}" catchtap="del">删除</text>
+        <text class="act act-view" hover-class="act-pressed" hover-stay-time="60"
+              data-id="{{item._id}}" catchtap="viewOnMap">查看</text>
+        <text class="act act-edit" hover-class="act-pressed" hover-stay-time="60"
+              data-id="{{item._id}}" catchtap="goEdit">{{item._status === 'approved' && !item.hasPendingUpdate ? '编辑' : '重提'}}</text>
+        <text class="act act-del" hover-class="act-pressed" hover-stay-time="60"
+              data-id="{{item._id}}" catchtap="del">删除</text>
       </view>
     </view>
     <!-- 次行：状态与附加信息 -->

@@ -15,20 +15,20 @@
   bindregionchange="onRegionChange"
 />
 
-<!-- 左上角：定位 / 刷新 -->
+<!-- 左上角：定位 / 刷新（iOS 悬浮圆钮） -->
 <view class="top-left-bar">
-  <view class="ctrl-btn" bindtap="backToLocation">
+  <view class="ctrl-btn" hover-class="btn-pressed" hover-stay-time="80" bindtap="backToLocation">
     <text class="ctrl-icon">◎</text>
     <text class="ctrl-text">定位</text>
   </view>
-  <view class="ctrl-btn" bindtap="refresh">
+  <view class="ctrl-btn" hover-class="btn-pressed" hover-stay-time="80" bindtap="refresh">
     <text class="ctrl-icon">⟳</text>
     <text class="ctrl-text">刷新</text>
   </view>
 </view>
 
 <!-- 右上角：图层按钮 -->
-<view class="layer-btn" bindtap="toggleLayerPanel">
+<view class="layer-btn" hover-class="btn-pressed" hover-stay-time="80" bindtap="toggleLayerPanel">
   <text class="layer-icon">▦</text>
   <text class="layer-text">图层</text>
 </view>
@@ -49,17 +49,17 @@
       <text class="layer-name">我的私有</text>
       <view class="layer-switch {{layers.private ? 'switch-on' : ''}}"><view class="layer-dot"></view></view>
     </view>
-    <view class="layer-done" bindtap="closeLayerPanel">完成</view>
+    <view class="layer-done" hover-class="done-pressed" hover-stay-time="80" bindtap="closeLayerPanel">完成</view>
   </view>
 </view>
 
-<!-- 底部一行：搜索栏 + 发布 -->
+<!-- 底部一行：搜索栏 + 发布（iOS 胶囊） -->
 <view class="bottom-bar">
-  <view class="search-bar" bindtap="goSearch">
+  <view class="search-bar" hover-class="bar-pressed" hover-stay-time="80" bindtap="goSearch">
     <text class="search-icon">🔍</text>
     <text class="search-text">搜索摆摊地点 / 分类</text>
   </view>
-  <view class="publish-btn" bindtap="goPublish">
+  <view class="publish-btn" hover-class="publish-pressed" hover-stay-time="80" bindtap="goPublish">
     <text class="publish-icon">＋</text>
     <text class="publish-text">发布地点</text>
   </view>

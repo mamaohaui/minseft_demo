@@ -1,17 +1,33 @@
 <view wx:if="{{spot}}" class="container">
-  <view class="title">{{spot.cur.title}}</view>
-  <view class="row">品类：{{spot.cur.category}}</view>
-  <view class="row">时段：{{spot.cur.timeSlot}}</view>
-  <view class="row">位置要求：{{spot.cur.positionReq}}</view>
-  <view class="row">管理要求：{{spot.cur.mgmtReq}}</view>
-  <view class="row">费用：{{spot.cur.feeType}} {{spot.cur.feeAmount ? spot.cur.feeAmount + '元' : ''}}</view>
-  <view class="row">评分：{{spot.ratingAvg}}（{{spot.ratingCount}} 人评）</view>
+  <!-- 大标题 + 摘要 -->
+  <view class="hero">
+    <view class="title">{{spot.cur.title}}</view>
+    <view class="hero-sub" wx:if="{{spot.creatorName}}">发布者：{{spot.creatorName}}</view>
+  </view>
+
+  <!-- 信息分组卡：iOS 键值行 -->
+  <view class="info-card">
+    <view class="info-row"><text class="info-label">品类</text><text class="info-value">{{spot.cur.category}}</text></view>
+    <view class="info-row row-divider"><text class="info-label">时段</text><text class="info-value">{{spot.cur.timeSlot}}</text></view>
+    <view class="info-row row-divider"><text class="info-label">位置要求</text><text class="info-value">{{spot.cur.positionReq}}</text></view>
+    <view class="info-row row-divider"><text class="info-label">管理要求</text><text class="info-value">{{spot.cur.mgmtReq}}</text></view>
+    <view class="info-row row-divider">
+      <text class="info-label">费用</text>
+      <text class="info-value">{{spot.cur.feeType}} {{spot.cur.feeAmount ? spot.cur.feeAmount + '元' : ''}}</text>
+    </view>
+    <view class="info-row row-divider">
+      <text class="info-label">评分</text>
+      <text class="info-value value-accent">★ {{spot.ratingAvg || '暂无'}}（{{spot.ratingCount}} 人评）</text>
+    </view>
+  </view>
+
   <view wx:if="{{spot.hasPendingUpdate}}" class="pending-tip">⚠ 有修改待公布</view>
 
+  <!-- 操作按钮：iOS 胶囊 -->
   <view class="btns">
-    <button size="mini" bindtap="toggleFav">{{favorited ? '取消收藏' : '收藏'}}</button>
-    <button wx:if="{{isOwner}}" size="mini" bindtap="goEdit">编辑</button>
-    <button wx:if="{{isOwner}}" size="mini" bindtap="del">删除</button>
+    <view class="pill pill-fill" hover-class="pill-fill-pressed" hover-stay-time="60" bindtap="toggleFav">{{favorited ? '★ 已收藏' : '☆ 收藏'}}</view>
+    <view wx:if="{{isOwner}}" class="pill pill-line" hover-class="pill-pressed" hover-stay-time="60" bindtap="goEdit">编辑</view>
+    <view wx:if="{{isOwner}}" class="pill pill-danger" hover-class="pill-pressed" hover-stay-time="60" bindtap="del">删除</view>
   </view>
 
   <!-- 写评价 -->
@@ -30,13 +46,13 @@
     </view>
     <textarea class="review-input" placeholder="说说这里怎么样…（选填）"
       value="{{form.content}}" bindinput="onContent" maxlength="200" />
-    <button class="submit-btn" size="mini" type="primary" bindtap="submitReview" disabled="{{submitting}}">
+    <view class="submit-btn" hover-class="pill-fill-pressed" hover-stay-time="60" bindtap="submitReview">
       {{submitting ? '提交中…' : '提交评价'}}
-    </button>
+    </view>
   </view>
   <view wx:else class="reviewed-bar">
     <text>已评价（{{form.rating}} 分）</text>
-    <text class="reviewed-edit" bindtap="openForm">修改</text>
+    <text class="reviewed-edit" hover-class="link-pressed" bindtap="openForm">修改</text>
   </view>
   <view wx:if="{{iReviewed && showForm}}" class="review-form">
     <view class="stars">
@@ -52,18 +68,20 @@
     </view>
     <textarea class="review-input" placeholder="说说这里怎么样…（选填）"
       value="{{form.content}}" bindinput="onContent" maxlength="200" />
-    <button class="submit-btn" size="mini" type="primary" bindtap="submitReview" disabled="{{submitting}}">
+    <view class="submit-btn" hover-class="pill-fill-pressed" hover-stay-time="60" bindtap="submitReview">
       {{submitting ? '提交中…' : '更新评价'}}
-    </button>
+    </view>
   </view>
 
   <view class="section-title">评价（{{reviews.length}}）</view>
-  <view wx:if="{{reviews.length === 0}}" class="empty">暂无评价，来抢沙发～</view>
-  <view wx:for="{{reviews}}" wx:key="_id" class="review">
-    <view class="review-head">
-      <text class="review-star">★ {{item.rating}}</text>
-      <text wx:if="{{item.content}}" class="review-content">{{item.content}}</text>
+  <view class="review-card">
+    <view wx:if="{{reviews.length === 0}}" class="empty">暂无评价，来抢沙发～</view>
+    <view wx:for="{{reviews}}" wx:key="_id" class="review {{index > 0 ? 'review-divider' : ''}}">
+      <view class="review-head">
+        <text class="review-star">★ {{item.rating}}</text>
+        <text wx:if="{{item.content}}" class="review-content">{{item.content}}</text>
+      </view>
+      <view wx:if="{{item.tags.length}}" class="tags">{{item.tags}}</view>
     </view>
-    <view wx:if="{{item.tags.length}}" class="tags">{{item.tags}}</view>
   </view>
 </view>
