@@ -21,6 +21,8 @@ Page({
     const target = getApp().globalData.viewSpot
     if (!target) return
     getApp().globalData.viewSpot = null
+    // 记录目标点，供 marker 点击进详情（目标 marker 用固定 id 999999）
+    this._focusSpot = target
     // 先同步放置目标标志（不等附近查询——查询失败或被并发拦截时标志也必须显示）
     this.setData({
       latitude: target.lat,
@@ -29,6 +31,8 @@ Page({
         id: 999999,
         latitude: target.lat,
         longitude: target.lng,
+        width: 30,
+        height: 30,
         title: target.title || '',
         callout: {
           content: target.title || '目标地点',
@@ -80,6 +84,8 @@ Page({
       id: i,
       latitude: s.current.location.lat,
       longitude: s.current.location.lng,
+      width: 25,
+      height: 25,
       title: s.current.title,
       // callout 气泡常显标题，点击气泡也可进详情
       callout: {
@@ -123,6 +129,11 @@ Page({
   },
 
   onMarkerTap(e) {
+    // 目标标志（查看跳转）：直接进该点详情
+    if (e.markerId === 999999 && this._focusSpot) {
+      wx.navigateTo({ url: `/pages/detail/detail?id=${this._focusSpot._id}` })
+      return
+    }
     const spot = this.data.spots[e.markerId]
     if (spot) {
       wx.navigateTo({ url: `/pages/detail/detail?id=${spot._id}` })
