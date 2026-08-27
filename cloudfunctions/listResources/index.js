@@ -17,6 +17,9 @@ exports.main = async (event) => {
     .skip(page * PAGE_SIZE)
     .limit(PAGE_SIZE)
     .get()
+    // 集合尚未创建（-502005）时按空列表返回，前端展示空态而不是报错
+    .catch(() => null)
 
-  return { ok: true, data: res.data, page, pageSize: PAGE_SIZE, hasMore: (res.data || []).length === PAGE_SIZE }
+  const data = (res && res.data) || []
+  return { ok: true, data, page, pageSize: PAGE_SIZE, hasMore: data.length === PAGE_SIZE }
 }

@@ -58,7 +58,17 @@ exports.main = async (event) => {
       createdAt: now,
       updatedAt: now,
     },
+  }).catch(err => {
+    // 集合未创建（-502005）时给出明确指引，而不是笼统报错
+    if (err && /not exist|COLLECTION_NOT_EXIST|-502005/i.test(err.errMsg || err.message || '')) {
+      return { __missing: true }
+    }
+    throw err
   })
+
+  if (res && res.__missing) {
+    return { ok: false, code: 'COLLECTION_NOT_EXIST', message: '数据库集合 resources 不存在，请先到云开发控制台-数据库新建集合 resources' }
+  }
 
   return { ok: true, data: { _id: res._id } }
 }
