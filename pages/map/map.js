@@ -19,11 +19,29 @@ Page({
   // 「我的发布-查看」跳转过来：globalData 传入目标点，居中并强制显示标志
   onShow() {
     const target = getApp().globalData.viewSpot
-    if (target) {
-      getApp().globalData.viewSpot = null
-      this.setData({ latitude: target.lat, longitude: target.lng })
-      this.loadNearby(target.lng, target.lat, target)
-    }
+    if (!target) return
+    getApp().globalData.viewSpot = null
+    // 先同步放置目标标志（不等附近查询——查询失败或被并发拦截时标志也必须显示）
+    this.setData({
+      latitude: target.lat,
+      longitude: target.lng,
+      markers: [{
+        id: 999999,
+        latitude: target.lat,
+        longitude: target.lng,
+        title: target.title || '',
+        callout: {
+          content: target.title || '目标地点',
+          display: 'ALWAYS',
+          borderRadius: 8,
+          padding: 8,
+          fontSize: 12,
+          bgColor: '#ffffff',
+          color: '#333333',
+        },
+      }],
+    })
+    this.loadNearby(target.lng, target.lat, target)
   },
 
   getLocation() {
