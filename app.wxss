@@ -1,10 +1,10 @@
 /**app.wxss**/
-.container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 200rpx 0;
-  box-sizing: border-box;
-} 
+/* 全局基础样式。
+   注意：不要在全局定义 .container 这类通用类名的布局（height/flex 等），
+   会与各页面自己的 .container 样式部分叠加，导致页面无法滚动、内容错位。
+   页面级容器样式一律写在各自页面的 wxss 里。 */
+page {
+  background: #f5f5f5;
+  font-size: 28rpx;
+  color: #333;
+}
