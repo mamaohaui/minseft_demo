@@ -1,0 +1,39 @@
+.container { padding: 24rpx; }
+.empty { color: #999; font-size: 26rpx; text-align: center; padding: 80rpx 0; }
+
+.spot-item {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+}
+.spot-row { display: flex; justify-content: space-between; align-items: center; }
+.t { font-size: 30rpx; font-weight: 600; color: #333; flex: 1; margin-right: 16rpx; }
+
+.badge { font-size: 22rpx; padding: 4rpx 16rpx; border-radius: 20rpx; flex-shrink: 0; }
+.badge-approved { background: #e8f8ef; color: #07c160; }
+.badge-pending { background: #fff7e6; color: #e6a23c; }
+.badge-updating { background: #e8f3ff; color: #409eff; }
+.badge-rejected { background: #fdeceb; color: #e64340; }
+
+.reject-reason { font-size: 24rpx; color: #e64340; margin-top: 12rpx; }
+.s { font-size: 24rpx; color: #999; margin-top: 8rpx; }
+
+.spot-actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+.act {
+  flex: 1;
+  text-align: center;
+  font-size: 26rpx;
+  padding: 12rpx 0;
+  border-radius: 10rpx;
+}
+.act-view { background: #e8f3ff; color: #409eff; }
+.act-edit { background: #e8f8ef; color: #07c160; }
+.act-del { background: #fdeceb; color: #e64340; }

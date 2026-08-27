@@ -16,6 +16,16 @@ Page({
     this.getLocation()
   },
 
+  // 「我的发布-查看」跳转过来：globalData 传入目标点，居中并强制显示标志
+  onShow() {
+    const target = getApp().globalData.viewSpot
+    if (target) {
+      getApp().globalData.viewSpot = null
+      this.setData({ latitude: target.lat, longitude: target.lng })
+      this.loadNearby(target.lng, target.lat, target)
+    }
+  },
+
   getLocation() {
     wx.getLocation({
       type: 'gcj02',
@@ -30,7 +40,7 @@ Page({
     })
   },
 
-  async loadNearby(lng, lat) {
+  async loadNearby(lng, lat, focusSpot) {
     if (this.data.loading) return
     this.setData({ loading: true })
     const r = await callCloud('getSpotsNearby', { lng, lat })
@@ -39,6 +49,15 @@ Page({
       return
     }
     const spots = (r.data || []).filter(s => s.current && s.current.location)
+
+    // 查看指定摊点：附近查询查不到（待审/驳回/private）时，强制补一个标志保证可见
+    if (focusSpot && !spots.some(s => s._id === focusSpot._id)) {
+      spots.push({
+        _id: focusSpot._id,
+        current: { title: focusSpot.title, location: { lat: focusSpot.lat, lng: focusSpot.lng } },
+      })
+    }
+
     const markers = spots.map((s, i) => ({
       id: i,
       latitude: s.current.location.lat,

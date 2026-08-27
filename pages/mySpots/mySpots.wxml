@@ -1,0 +1,20 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+  <view wx:if="{{!loading && mySpots.length === 0}}" class="empty">
+    还没有发布过地点，去地图页点「发布地点」发一个吧～
+  </view>
+
+  <view wx:for="{{mySpots}}" wx:key="_id" class="spot-item">
+    <view class="spot-row">
+      <text class="t">{{item._title}}</text>
+      <text class="badge badge-{{item._status}}">{{item._statusText}}</text>
+    </view>
+    <view wx:if="{{item.rejectReason}}" class="reject-reason">驳回原因：{{item.rejectReason}}</view>
+    <view class="s">可见性：{{item.visibility === 'public' ? '公开' : (item.visibility === 'vip' ? 'VIP' : '私人')}}</view>
+    <view class="spot-actions">
+      <text class="act act-view" data-id="{{item._id}}" catchtap="viewOnMap">查看</text>
+      <text class="act act-edit" data-id="{{item._id}}" catchtap="goEdit">{{item._status === 'approved' && !item.hasPendingUpdate ? '编辑' : '修改重提'}}</text>
+      <text class="act act-del" data-id="{{item._id}}" catchtap="del">删除</text>
+    </view>
+  </view>
+</view>

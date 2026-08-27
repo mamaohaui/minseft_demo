@@ -1,20 +1,13 @@
 <view class="container">
   <view class="header">角色：{{user ? user.role : '...'}}</view>
 
-  <!-- 我的发布（发布入口统一在地图页右下角主按钮） -->
-  <view class="section-title">我的发布</view>
-  <view wx:if="{{mySpots.length === 0}}" class="empty">还没有发布过地点，去地图页点「发布地点」发一个吧～</view>
-  <view wx:for="{{mySpots}}" wx:key="_id" class="spot-item" data-id="{{item._id}}" bindtap="goSpot">
-    <view class="spot-row">
-      <text class="t">{{item._title}}</text>
-      <text class="badge badge-{{item._status}}">{{item._statusText}}</text>
+  <!-- 我的发布：独立页入口（发布新地点统一走地图页右下角主按钮） -->
+  <view class="entry-row" bindtap="goMySpots">
+    <view class="entry-left">
+      <text class="entry-title">我的发布</text>
+      <text class="entry-sub" wx:if="{{mySpots.length}}">{{mySpots.length}} 条记录</text>
     </view>
-    <view wx:if="{{item.rejectReason}}" class="reject-reason">驳回原因：{{item.rejectReason}}</view>
-    <view class="s">可见性：{{item.visibility === 'public' ? '公开' : (item.visibility === 'vip' ? 'VIP' : '私人')}}</view>
-    <view class="spot-actions">
-      <text class="link" data-id="{{item._id}}" catchtap="goDetail">查看</text>
-      <text class="link" data-id="{{item._id}}" catchtap="goEdit">{{item._status === 'approved' && !item.hasPendingUpdate ? '编辑' : '修改重提'}}</text>
-    </view>
+    <text class="arrow">›</text>
   </view>
 
   <view class="section-title">我的收藏</view>

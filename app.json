@@ -5,7 +5,8 @@
     "pages/mine/mine",
     "pages/detail/detail",
     "pages/publish/publish",
-    "pages/admin/admin"
+    "pages/admin/admin",
+    "pages/mySpots/mySpots"
   ],
   "window": {
     "navigationBarTextStyle": "black",

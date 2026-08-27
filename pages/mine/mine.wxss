@@ -7,14 +7,18 @@
 .s { color: #999; font-size: 24rpx; margin-top: 4rpx; }
 .admin-btn { margin-top: 40rpx; }
 
-/* 我的发布 */
-.spot-item { padding: 20rpx 0; border-bottom: 1rpx solid #eee; }
-.spot-row { display: flex; justify-content: space-between; align-items: center; }
-.badge { font-size: 20rpx; padding: 4rpx 14rpx; border-radius: 20rpx; margin-left: 12rpx; flex-shrink: 0; }
-.badge-approved { background: #e8f7ee; color: #07c160; }
-.badge-pending { background: #fff7e6; color: #ff9900; }
-.badge-updating { background: #e6f0ff; color: #3b7dff; }
-.badge-rejected { background: #ffeceb; color: #e64340; }
-.reject-reason { color: #e64340; font-size: 24rpx; margin-top: 8rpx; }
-.spot-actions { margin-top: 12rpx; display: flex; gap: 30rpx; }
-.link { color: #576b95; font-size: 24rpx; }
+/* 我的发布入口行 */
+.entry-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx 24rpx;
+  margin: 8rpx 0 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+}
+.entry-left { display: flex; flex-direction: column; }
+.entry-title { font-size: 30rpx; font-weight: 600; color: #333; }
+.entry-sub { font-size: 24rpx; color: #999; margin-top: 6rpx; }
+.arrow { font-size: 40rpx; color: #c8c8c8; line-height: 1; }
