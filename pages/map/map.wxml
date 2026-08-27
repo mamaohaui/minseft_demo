@@ -13,17 +13,23 @@
   bindmarkertap="onMarkerTap"
   bindregionchange="onRegionChange"
 />
-<view class="publish-btn" bindtap="goPublish">＋ 发布地点</view>
 
-<view class="map-ctrl top-left" bindtap="backToLocation">
-  <text class="ctrl-icon">◎</text>
-  <text class="ctrl-text">回到定位</text>
-</view>
-<view class="map-ctrl top-right" bindtap="refresh">
-  <text class="ctrl-icon">⟳</text>
-  <text class="ctrl-text">刷新</text>
+<!-- 右下角统一操作区：发布为唯一主入口，定位/刷新收纳其下 -->
+<view class="action-bar">
+  <view class="publish-btn" bindtap="goPublish">
+    <text class="publish-icon">＋</text>
+    <text class="publish-text">发布地点</text>
+  </view>
+  <view class="ctrl-btn" bindtap="backToLocation">
+    <text class="ctrl-icon">◎</text>
+    <text class="ctrl-text">定位</text>
+  </view>
+  <view class="ctrl-btn" bindtap="refresh">
+    <text class="ctrl-icon">⟳</text>
+    <text class="ctrl-text">刷新</text>
+  </view>
 </view>
 
 <view wx:if="{{loaded && markers.length === 0}}" class="empty-tip">
-  附近 5 公里还没有摆摊点，点右下角发布第一个吧！
+  附近还没有摆摊点，点右下角发布第一个吧！
 </view>

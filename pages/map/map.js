@@ -33,7 +33,7 @@ Page({
   async loadNearby(lng, lat) {
     if (this.data.loading) return
     this.setData({ loading: true })
-    const r = await callCloud('getSpotsNearby', { lng, lat, maxDistance: 5000 })
+    const r = await callCloud('getSpotsNearby', { lng, lat })
     if (!r.ok) {
       this.setData({ loading: false, loaded: true })
       return

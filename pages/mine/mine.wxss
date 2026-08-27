@@ -1,7 +1,6 @@
 .container { padding: 24rpx; }
 .header { font-size: 32rpx; font-weight: bold; padding: 20rpx 0; }
-.section-title { font-size: 30rpx; font-weight: bold; margin: 24rpx 0 12rpx; display: flex; justify-content: space-between; align-items: center; }
-.add-link { font-size: 24rpx; font-weight: normal; color: #07c160; }
+.section-title { font-size: 30rpx; font-weight: bold; margin: 24rpx 0 12rpx; }
 .empty { color: #999; font-size: 26rpx; }
 .item { padding: 20rpx 0; border-bottom: 1rpx solid #eee; }
 .t { font-size: 30rpx; }

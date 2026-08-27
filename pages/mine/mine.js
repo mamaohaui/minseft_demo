@@ -40,10 +40,6 @@ Page({
     wx.navigateTo({ url: `/pages/publish/publish?id=${id}` })
   },
 
-  goPublish() {
-    wx.navigateTo({ url: '/pages/publish/publish' })
-  },
-
   goAdmin() {
     wx.navigateTo({ url: '/pages/admin/admin' })
   },

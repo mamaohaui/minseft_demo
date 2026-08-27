@@ -6,7 +6,7 @@ const _ = db.command
 
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
-  const { lng, lat, maxDistance = 5000 } = event
+  const { lng, lat } = event
 
   if (!lng || !lat) return { ok: false, code: 'INVALID', message: '缺少坐标' }
 
@@ -19,12 +19,11 @@ exports.main = async (event) => {
 
   const visCond = role === 'vip' ? _.in(['public', 'vip']) : 'public'
 
-  // 主查询：附近公开/VIP 地点
+  // 主查询：全部公开/VIP 地点，按距离由近到远排序（不设距离上限）
   const main = await db.collection('spots')
     .where({
       'current.location': _.geoNear({
         geometry: db.Geo.Point(lng, lat),
-        maxDistance,
       }),
       visibility: visCond,
     })
