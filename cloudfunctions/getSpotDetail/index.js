@@ -27,7 +27,14 @@ exports.main = async (event) => {
   if (spot.current && spot.current.location) spot.current.location = toLngLat(spot.current.location)
   if (spot.pending && spot.pending.location) spot.pending.location = toLngLat(spot.pending.location)
 
-  // 当前用户是否已收藏（详情页按钮初始状态）
+  // 当前用户是否已收藏 + 是否为创建者（前端省一次 getUser 调用）
   const fav = await db.collection('favorites').where({ openid: OPENID, spotId }).get()
-  return { ok: true, data: { ...spot, favorited: fav.data.length > 0 } }
+  return {
+    ok: true,
+    data: {
+      ...spot,
+      favorited: fav.data.length > 0,
+      isOwner: spot.creatorOpenid === OPENID,
+    },
+  }
 }

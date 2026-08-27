@@ -4,3 +4,4 @@
 .t { font-size: 30rpx; }
 .s { color: #999; font-size: 24rpx; margin-top: 8rpx; }
 .empty { text-align: center; color: #999; padding: 80rpx 0; }
+.hint { text-align: center; color: #999; font-size: 24rpx; padding: 16rpx 0; }

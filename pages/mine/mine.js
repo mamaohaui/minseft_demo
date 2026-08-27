@@ -6,12 +6,17 @@ Page({
   onShow() { this.load() },
 
   async load() {
-    const u = await callCloud('getUser')
-    if (u.ok) this.setData({ user: u.data })
-    const f = await callCloud('getFavorites')
-    if (f.ok) this.setData({ favorites: f.data })
-    const m = await callCloud('getMySpots')
-    if (m.ok) this.setData({ mySpots: m.data })
+    // 三个请求并行发出（原来串行要 1-2 秒，现在约等于最慢那一个）
+    const [u, f, m] = await Promise.all([
+      callCloud('getUser'),
+      callCloud('getFavorites'),
+      callCloud('getMySpots'),
+    ])
+    this.setData({
+      user: u.ok ? u.data : this.data.user,
+      favorites: f.ok ? f.data : this.data.favorites,
+      mySpots: m.ok ? m.data : this.data.mySpots,
+    })
   },
 
   goDetail(e) {

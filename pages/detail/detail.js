@@ -26,15 +26,16 @@ Page({
   },
 
   async load() {
-    const r = await callCloud('getSpotDetail', { spotId: this.spotId })
+    // 并行请求详情+评价（服务端已返回 isOwner/favorited，无需再调 getUser）
+    const [r, rv] = await Promise.all([
+      callCloud('getSpotDetail', { spotId: this.spotId }),
+      callCloud('getReviews', { spotId: this.spotId }),
+    ])
     if (!r.ok) return
     const spot = r.data
     const cur = spot.current || {}
-    const me = await callCloud('getUser')
-    const isOwner = spot.creatorOpenid === me.data._id
-    this.setData({ spot: { ...spot, cur }, isOwner, favorited: !!spot.favorited })
+    this.setData({ spot: { ...spot, cur }, isOwner: !!spot.isOwner, favorited: !!spot.favorited })
 
-    const rv = await callCloud('getReviews', { spotId: this.spotId })
     if (rv.ok) {
       const my = rv.myReview
       this.setData({
