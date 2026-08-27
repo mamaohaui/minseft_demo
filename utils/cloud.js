@@ -13,8 +13,15 @@ function callCloud(name, data = {}) {
       })
       .catch(err => {
         console.error(`云函数 ${name} 调用失败`, err)
-        wx.showToast({ title: '操作失败，请重试', icon: 'none' })
-        resolve({ ok: false, code: 'NETWORK', message: '网络异常' })
+        // 区分「云函数未部署」与普通网络失败，提示更明确
+        const msg = (err && err.errMsg) || ''
+        const notFound = err && (err.errCode === -404011 || /not ?found|no such function|不存在/i.test(msg))
+        wx.showToast({
+          title: notFound ? `云函数 ${name} 未部署` : '操作失败，请重试',
+          icon: 'none',
+          duration: 2500,
+        })
+        resolve({ ok: false, code: notFound ? 'NOT_DEPLOYED' : 'NETWORK', message: '网络异常' })
       })
   })
 }
