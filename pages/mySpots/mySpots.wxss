@@ -8,32 +8,47 @@
   margin-bottom: 20rpx;
   box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
 }
-.spot-row { display: flex; justify-content: space-between; align-items: center; }
-.t { font-size: 30rpx; font-weight: 600; color: #333; flex: 1; margin-right: 16rpx; }
 
-.badge { font-size: 22rpx; padding: 4rpx 16rpx; border-radius: 20rpx; flex-shrink: 0; }
-.badge-approved { background: #e8f8ef; color: #07c160; }
-.badge-pending { background: #fff7e6; color: #e6a23c; }
-.badge-updating { background: #e8f3ff; color: #409eff; }
-.badge-rejected { background: #fdeceb; color: #e64340; }
-
-.reject-reason { font-size: 24rpx; color: #e64340; margin-top: 12rpx; }
-.s { font-size: 24rpx; color: #999; margin-top: 8rpx; }
-
-.spot-actions {
+/* 主行：名称 + 三个操作按钮同行 */
+.spot-row {
   display: flex;
-  gap: 20rpx;
-  margin-top: 20rpx;
-  padding-top: 20rpx;
-  border-top: 1rpx solid #f0f0f0;
+  justify-content: space-between;
+  align-items: center;
 }
-.act {
+.t {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
   flex: 1;
-  text-align: center;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 16rpx;
+}
+.acts { display: flex; align-items: center; flex-shrink: 0; }
+.act {
   font-size: 26rpx;
-  padding: 12rpx 0;
-  border-radius: 10rpx;
+  padding: 8rpx 22rpx;
+  border-radius: 24rpx;
+  margin-left: 12rpx;
 }
 .act-view { background: #e8f3ff; color: #409eff; }
 .act-edit { background: #e8f8ef; color: #07c160; }
 .act-del { background: #fdeceb; color: #e64340; }
+
+/* 次行：状态标签 + 可见性 */
+.meta-row {
+  display: flex;
+  align-items: center;
+  margin-top: 14rpx;
+  gap: 12rpx;
+}
+.badge { font-size: 22rpx; padding: 4rpx 16rpx; border-radius: 20rpx; }
+.badge-approved { background: #e8f8ef; color: #07c160; }
+.badge-pending { background: #fff7e6; color: #e6a23c; }
+.badge-updating { background: #e8f3ff; color: #409eff; }
+.badge-rejected { background: #fdeceb; color: #e64340; }
+.vis { font-size: 24rpx; color: #999; }
+
+.reject-reason { font-size: 24rpx; color: #e64340; margin-top: 10rpx; }
