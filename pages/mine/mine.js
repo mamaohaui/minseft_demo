@@ -19,14 +19,14 @@ Page({
     })
   },
 
-  goDetail(e) {
-    const id = e.currentTarget.dataset.id
-    wx.navigateTo({ url: `/pages/detail/detail?id=${id}` })
-  },
-
   // 我的发布：独立管理页（查看/编辑/删除）
   goMySpots() {
     wx.navigateTo({ url: '/pages/mySpots/mySpots' })
+  },
+
+  // 我的收藏：独立管理页（查看/取消收藏）
+  goFavorites() {
+    wx.navigateTo({ url: '/pages/favorites/favorites' })
   },
 
   goAdmin() {

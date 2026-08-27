@@ -12,6 +12,7 @@ Page({
     spot: null,
     reviews: [],
     favorited: false,
+    followed: false,     // 是否已关注发布者
     isOwner: false,
     iReviewed: false,      // 当前用户是否已评
     showForm: false,       // 是否展开评价表单
@@ -34,7 +35,7 @@ Page({
     if (!r.ok) return
     const spot = r.data
     const cur = spot.current || {}
-    this.setData({ spot: { ...spot, cur }, isOwner: !!spot.isOwner, favorited: !!spot.favorited })
+    this.setData({ spot: { ...spot, cur }, isOwner: !!spot.isOwner, favorited: !!spot.favorited, followed: !!spot.followed })
 
     if (rv.ok) {
       const my = rv.myReview
@@ -49,6 +50,17 @@ Page({
   async toggleFav() {
     const r = await callCloud('toggleFavorite', { spotId: this.spotId })
     if (r.ok) this.setData({ favorited: r.data.favorited })
+  },
+
+  // 关注 / 取消关注发布者（关注后，TA 公开发的地点进入地图"关注分享"图层）
+  async toggleFollow() {
+    const spot = this.data.spot
+    if (!spot || !spot.creatorOpenid) return
+    const r = await callCloud('toggleFollow', { targetOpenid: spot.creatorOpenid })
+    if (r.ok) {
+      this.setData({ followed: !!r.data.followed })
+      wx.showToast({ title: r.data.followed ? '已关注，TA 的新地点将出现在关注图层' : '已取消关注', icon: 'none' })
+    }
   },
 
   goEdit() {

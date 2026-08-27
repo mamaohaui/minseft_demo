@@ -1,6 +1,8 @@
 const { callCloud } = require('../../utils/cloud')
+const { REGIONS } = require('../../utils/constants')
 
 const FOCUS_MARKER_ID = 999999 // 「查看」目标标志固定 id
+const DEFAULT_REGION = REGIONS[0] // 定位失败时的兜底：成都市中心
 
 // 坐标归一化兜底：兼容 GeoJSON {coordinates} / GeoPoint {longitude,latitude} / 已是 {lng,lat}
 const toLatLng = (loc) => {
@@ -15,17 +17,28 @@ const toLatLng = (loc) => {
   return null
 }
 
+// 点位归一化：current.location 统一为 {lng,lat}，无坐标返回 null
+const normalizeSpot = (s) => {
+  if (!s || !s.current) return null
+  const p = toLatLng(s.current.location)
+  if (!p) return null
+  s.current.location = p
+  return s
+}
+
 Page({
   data: {
-    latitude: 30.657,   // 地图渲染中心（仅定位/回到定位时更新）
-    longitude: 104.081,
-    centerLat: 30.657,  // 地图当前中心（regionchange 记录，供刷新用，不参与渲染）
-    centerLng: 104.081,
+    latitude: DEFAULT_REGION.lat,   // 地图渲染中心（仅定位/选地区/回到定位时更新）
+    longitude: DEFAULT_REGION.lng,
+    centerLat: DEFAULT_REGION.lat,  // 地图当前中心（regionchange 记录，供刷新用，不参与渲染）
+    centerLng: DEFAULT_REGION.lng,
+    regionName: DEFAULT_REGION.name,
+    regionNames: REGIONS.map(r => r.name),
     markers: [],
     spots: [],
     loaded: false,    // 首次加载完成（控制空态提示闪现）
     loading: false,   // 防重复刷新
-    // 图层开关：我的私有（第一）/ 关注分享（我收藏的）/ 公共摊点（默认全开）
+    // 图层开关：我的私有（第一）/ 关注分享（收藏+关注的人发布）/ 公共摊点（默认全开）
     layers: { private: true, followed: true, public: true },
     layerPanelOpen: false,
   },
@@ -36,8 +49,9 @@ Page({
 
   // 「我的发布/管理员审核-查看」跳转过来：globalData 传入目标点，居中并强制显示标志
   onShow() {
-    // 每次回地图页静默刷新收藏（详情页收藏/取消后图层即时生效）
+    // 每次回地图页静默刷新收藏+关注（详情页收藏/关注/取关后图层即时生效）
     this.refreshFavs()
+    this.refreshFollowed()
     const target = getApp().globalData.viewSpot
     if (!target) return
     getApp().globalData.viewSpot = null
@@ -86,12 +100,29 @@ Page({
         this.loadNearby(res.longitude, res.latitude)
       },
       fail: () => {
-        if (!this._focusSpot) wx.showToast({ title: '定位失败，显示默认位置', icon: 'none' })
-        const lng = this._focusSpot ? this._focusSpot.lng : 104.081
-        const lat = this._focusSpot ? this._focusSpot.lat : 30.657
-        this.loadNearby(lng, lat, this._focusSpot)
+        if (!this._focusSpot) wx.showToast({ title: '定位失败，显示默认地区', icon: 'none' })
+        // 定位失败兜底：回到当前选择的地区中心（默认成都市中心）
+        const spot = this._focusSpot
+        const lng = spot ? spot.lng : this.data.centerLng
+        const lat = spot ? spot.lat : this.data.centerLat
+        this.loadNearby(lng, lat, spot)
       },
     })
+  },
+
+  // 选择地区：以该地区中心点加载周边摊点（公共摊点基础显示入口）
+  onPickRegion(e) {
+    const region = REGIONS[Number(e.detail.value)]
+    if (!region) return
+    this._focusSpot = null // 选地区退出"查看目标"模式
+    this.setData({
+      regionName: region.name,
+      latitude: region.lat,
+      longitude: region.lng,
+      centerLat: region.lat,
+      centerLng: region.lng,
+    })
+    this.loadNearby(region.lng, region.lat)
   },
 
   async loadNearby(lng, lat, focusSpot) {
@@ -103,23 +134,28 @@ Page({
       return
     }
     // 全量缓存：图层开关切换时本地过滤即时生效，不重新请求（坐标本地归一化兜底）
-    this._allSpots = (r.data || []).map(s => {
-      if (s.current) {
-        const p = toLatLng(s.current.location)
-        if (p) s.current.location = p
-      }
-      return s
-    }).filter(s => s.current && s.current.location)
+    this._allSpots = (r.data || []).map(normalizeSpot).filter(Boolean)
     // 焦点以「完成时刻」为准：即使本查询早于 onShow 发出（慢查询竞态），
     // 回来重建 markers 时也带上目标标志，不会被冲掉
     this.applyLayers(focusSpot || this._focusSpot)
   },
 
-  // 拉取我的收藏点位 id（"关注分享"图层数据源），静默失败不影响地图
+  // 拉取我的收藏（"关注分享"图层数据源之一），静默失败不影响地图
   async refreshFavs() {
     const r = await callCloud('getFavorites')
     if (r.ok) {
-      this._favIds = (r.data || []).map(s => s._id)
+      this._favSpots = (r.data || []).map(normalizeSpot).filter(Boolean)
+      this._favIds = this._favSpots.map(s => s._id)
+      this.applyLayers()
+    }
+  },
+
+  // 拉取我关注的人公开发布的点位（"关注分享"图层数据源之二）
+  async refreshFollowed() {
+    const r = await callCloud('getFollowedSpots')
+    if (r.ok) {
+      this._followedSpots = (r.data.spots || []).map(normalizeSpot).filter(Boolean)
+      this._followeeIds = r.data.followees || []
       this.applyLayers()
     }
   },
@@ -128,10 +164,16 @@ Page({
   applyLayers(focus) {
     const L = this.data.layers
     const favIds = this._favIds || []
-    // 按优先级归类去重：我的私有 > 关注分享（收藏）> 公共摊点
-    let spots = (this._allSpots || []).filter(s => {
+    const followeeIds = this._followeeIds || []
+    // 候选池合并去重：附近点位 + 我的收藏 + 关注的人发布的点位（后写入的优先级高）
+    const cand = {}
+    ;(this._allSpots || []).forEach(s => { cand[s._id] = s })
+    ;(this._favSpots || []).forEach(s => { cand[s._id] = s })
+    ;(this._followedSpots || []).forEach(s => { cand[s._id] = s })
+    // 按优先级归类：我的私有 > 关注分享（收藏 / 关注的人发布）> 公共摊点
+    let spots = Object.values(cand).filter(s => {
       if (s.visibility === 'private') return L.private
-      if (favIds.includes(s._id)) return L.followed
+      if (favIds.includes(s._id) || followeeIds.includes(s.creatorOpenid)) return L.followed
       return L.public
     })
     const f = focus || this._focusSpot
@@ -188,7 +230,7 @@ Page({
         this.mapCtx.moveToLocation()
         this.loadNearby(res.longitude, res.latitude)
       },
-      fail: () => wx.showToast({ title: '定位失败', icon: 'none' }),
+      fail: () => wx.showToast({ title: '定位失败，可在顶部选择地区', icon: 'none' }),
     })
   },
 

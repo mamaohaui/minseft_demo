@@ -1,0 +1,24 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="empty">加载中...</view>
+  <view wx:if="{{!loading && favorites.length === 0}}" class="empty">
+    还没有收藏地点，去地图逛逛，看到心仪的摊点点「收藏」吧～
+  </view>
+
+  <view wx:for="{{favorites}}" wx:key="_id" class="fav-item">
+    <!-- 主行：名称在左，查看/取消收藏在右，一行显示完 -->
+    <view class="fav-row">
+      <text class="t">{{item._title}}</text>
+      <view class="acts">
+        <text class="act act-view" hover-class="act-pressed" hover-stay-time="60"
+              data-id="{{item._id}}" catchtap="viewOnMap">查看</text>
+        <text class="act act-del" hover-class="act-pressed" hover-stay-time="60"
+              data-id="{{item._id}}" catchtap="unfav">取消收藏</text>
+      </view>
+    </view>
+    <!-- 次行：品类 + 发布者 -->
+    <view class="meta-row">
+      <text class="cat">{{item._sub}}</text>
+      <text class="creator" wx:if="{{item.creatorName}}">· {{item.creatorName}}</text>
+    </view>
+  </view>
+</view>

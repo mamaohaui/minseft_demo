@@ -27,15 +27,24 @@ exports.main = async (event) => {
   if (spot.current && spot.current.location) spot.current.location = toLngLat(spot.current.location)
   if (spot.pending && spot.pending.location) spot.pending.location = toLngLat(spot.pending.location)
 
-  // 当前用户是否已收藏 + 是否为创建者（前端省一次 getUser 调用）
-  // 注意：用户从未收藏过时 favorites 集合可能不存在，查询会抛错，必须 catch 兜底
+  // 当前用户是否已收藏 + 是否为创建者 + 是否已关注发布者（前端省多次调用）
+  // 注意：用户从未收藏过时 favorites 集合可能不存在，查询会抛错，必须 catch 兜底（follows 同理）
   const fav = await db.collection('favorites').where({ openid: OPENID, spotId }).get().catch(() => null)
+  let followed = false
+  if (spot.creatorOpenid && spot.creatorOpenid !== OPENID && spot.creatorOpenid !== 'base') {
+    const fl = await db.collection('follows')
+      .where({ follower: OPENID, followee: spot.creatorOpenid })
+      .get()
+      .catch(() => null)
+    followed = !!(fl && fl.data && fl.data.length > 0)
+  }
   return {
     ok: true,
     data: {
       ...spot,
       favorited: !!(fav && fav.data && fav.data.length > 0),
       isOwner: spot.creatorOpenid === OPENID,
+      followed,
     },
   }
 }

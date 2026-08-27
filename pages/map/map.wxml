@@ -15,6 +15,15 @@
   bindregionchange="onRegionChange"
 />
 
+<!-- 顶部中间：地区选择器（选区后显示该地区周边公共摊点） -->
+<picker mode="selector" range="{{regionNames}}" bindchange="onPickRegion">
+  <view class="region-btn" hover-class="btn-pressed" hover-stay-time="80">
+    <text class="region-icon">📍</text>
+    <text class="region-text">{{regionName}}</text>
+    <text class="region-caret">▾</text>
+  </view>
+</picker>
+
 <!-- 左上角：定位 / 刷新（iOS 悬浮圆钮） -->
 <view class="top-left-bar">
   <view class="ctrl-btn" hover-class="btn-pressed" hover-stay-time="80" bindtap="backToLocation">
@@ -65,5 +74,5 @@
 </view>
 
 <view wx:if="{{loaded && markers.length === 0}}" class="empty-tip">
-  附近还没有摆摊点，点下方发布第一个吧！
+  当前地区暂无摊点，可换地区或发布第一个
 </view>

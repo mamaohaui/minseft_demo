@@ -83,22 +83,5 @@
 
 .arrow { font-size: 40rpx; color: #c7c7cc; line-height: 1; font-weight: 300; }
 
-/* 收藏行 */
-.empty-card {
-  padding: 64rpx 0;
-  text-align: center;
-  color: #8e8e93;
-  font-size: 26rpx;
-}
-.fav-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 30rpx 32rpx;
-}
-.fav-main { display: flex; flex-direction: column; gap: 8rpx; }
-.fav-title { font-size: 30rpx; font-weight: 500; color: #1c1c1e; }
-.fav-sub { font-size: 24rpx; color: #8e8e93; }
-
 /* 按下态（iOS 高亮灰） */
 .row-pressed { background: rgba(60,60,67,0.06); }

@@ -8,7 +8,8 @@
     "pages/detail/detail",
     "pages/publish/publish",
     "pages/admin/admin",
-    "pages/mySpots/mySpots"
+    "pages/mySpots/mySpots",
+    "pages/favorites/favorites"
   ],
   "window": {
     "navigationBarTextStyle": "black",

@@ -26,6 +26,10 @@
   <!-- 操作按钮：iOS 胶囊 -->
   <view class="btns">
     <view class="pill pill-fill" hover-class="pill-fill-pressed" hover-stay-time="60" bindtap="toggleFav">{{favorited ? '★ 已收藏' : '☆ 收藏'}}</view>
+    <view wx:if="{{!isOwner && spot.creatorOpenid && spot.creatorOpenid !== 'base'}}"
+          class="pill {{followed ? 'pill-fill' : 'pill-line'}}"
+          hover-class="{{followed ? 'pill-fill-pressed' : 'pill-pressed'}}" hover-stay-time="60"
+          bindtap="toggleFollow">{{followed ? '✓ 已关注' : '+ 关注发布者'}}</view>
     <view wx:if="{{isOwner}}" class="pill pill-line" hover-class="pill-pressed" hover-stay-time="60" bindtap="goEdit">编辑</view>
     <view wx:if="{{isOwner}}" class="pill pill-danger" hover-class="pill-pressed" hover-stay-time="60" bindtap="del">删除</view>
   </view>
