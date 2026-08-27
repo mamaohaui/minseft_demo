@@ -121,17 +121,6 @@
 }
 .switch-on .layer-dot { transform: translateX(36rpx); }
 
-.layer-done {
-  margin-top: 4rpx;
-  text-align: center;
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #007aff;
-  border-top: 1rpx solid rgba(60,60,67,0.12);
-  padding: 22rpx 0 6rpx;
-}
-.done-pressed { opacity: 0.5; }
-
 /* ===== 底部一行：搜索栏 + 发布按钮（iOS 胶囊） ===== */
 .bottom-bar {
   position: fixed;

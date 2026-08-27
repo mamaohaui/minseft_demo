@@ -25,8 +25,8 @@ Page({
     spots: [],
     loaded: false,    // 首次加载完成（控制空态提示闪现）
     loading: false,   // 防重复刷新
-    // 图层开关：公开 / VIP 专属 / 我的私有（默认全开）
-    layers: { public: true, vip: true, private: true },
+    // 图层开关：我的私有（第一）/ 关注分享（我收藏的）/ 公共摊点（默认全开）
+    layers: { private: true, followed: true, public: true },
     layerPanelOpen: false,
   },
 
@@ -36,6 +36,8 @@ Page({
 
   // 「我的发布/管理员审核-查看」跳转过来：globalData 传入目标点，居中并强制显示标志
   onShow() {
+    // 每次回地图页静默刷新收藏（详情页收藏/取消后图层即时生效）
+    this.refreshFavs()
     const target = getApp().globalData.viewSpot
     if (!target) return
     getApp().globalData.viewSpot = null
@@ -113,12 +115,23 @@ Page({
     this.applyLayers(focusSpot || this._focusSpot)
   },
 
+  // 拉取我的收藏点位 id（"关注分享"图层数据源），静默失败不影响地图
+  async refreshFavs() {
+    const r = await callCloud('getFavorites')
+    if (r.ok) {
+      this._favIds = (r.data || []).map(s => s._id)
+      this.applyLayers()
+    }
+  },
+
   // 按图层开关过滤并重建 markers；目标标志始终显示（不受图层影响），并剔除普通标志中的重复
   applyLayers(focus) {
     const L = this.data.layers
+    const favIds = this._favIds || []
+    // 按优先级归类去重：我的私有 > 关注分享（收藏）> 公共摊点
     let spots = (this._allSpots || []).filter(s => {
       if (s.visibility === 'private') return L.private
-      if (s.visibility === 'vip') return L.vip
+      if (favIds.includes(s._id)) return L.followed
       return L.public
     })
     const f = focus || this._focusSpot

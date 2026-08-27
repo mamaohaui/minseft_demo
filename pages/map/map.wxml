@@ -33,23 +33,22 @@
   <text class="layer-text">图层</text>
 </view>
 
-<!-- 图层面板：点遮罩或"完成"关闭 -->
+<!-- 图层面板：再点图层按钮或点遮罩收回 -->
 <view wx:if="{{layerPanelOpen}}" class="layer-mask" bindtap="closeLayerPanel">
   <view class="layer-panel" catchtap="noop">
     <view class="layer-panel-title">显示图层</view>
-    <view class="layer-option" data-key="public" bindtap="toggleLayer">
-      <text class="layer-name">公开地点</text>
-      <view class="layer-switch {{layers.public ? 'switch-on' : ''}}"><view class="layer-dot"></view></view>
-    </view>
-    <view class="layer-option" data-key="vip" bindtap="toggleLayer">
-      <text class="layer-name">VIP 专属</text>
-      <view class="layer-switch {{layers.vip ? 'switch-on' : ''}}"><view class="layer-dot"></view></view>
-    </view>
     <view class="layer-option" data-key="private" bindtap="toggleLayer">
       <text class="layer-name">我的私有</text>
       <view class="layer-switch {{layers.private ? 'switch-on' : ''}}"><view class="layer-dot"></view></view>
     </view>
-    <view class="layer-done" hover-class="done-pressed" hover-stay-time="80" bindtap="closeLayerPanel">完成</view>
+    <view class="layer-option" data-key="followed" bindtap="toggleLayer">
+      <text class="layer-name">关注分享</text>
+      <view class="layer-switch {{layers.followed ? 'switch-on' : ''}}"><view class="layer-dot"></view></view>
+    </view>
+    <view class="layer-option" data-key="public" bindtap="toggleLayer">
+      <text class="layer-name">公共摊点</text>
+      <view class="layer-switch {{layers.public ? 'switch-on' : ''}}"><view class="layer-dot"></view></view>
+    </view>
   </view>
 </view>
 

@@ -1,6 +1,32 @@
 .container { padding: 24rpx 32rpx 48rpx; }
 .empty { text-align: center; color: #8e8e93; padding: 120rpx 0; font-size: 27rpx; }
 
+/* 基础数据库工具卡 */
+.base-tool {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  background: #fff;
+  border-radius: 28rpx;
+  padding: 28rpx 30rpx;
+  margin-bottom: 28rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.06);
+}
+.base-info { flex: 1; min-width: 0; }
+.base-title { font-size: 30rpx; font-weight: 600; color: #1c1c1e; }
+.base-desc { font-size: 24rpx; color: #8e8e93; margin-top: 8rpx; }
+.base-btn {
+  flex-shrink: 0;
+  font-size: 27rpx;
+  font-weight: 600;
+  color: #fff;
+  background: #007aff;
+  padding: 14rpx 36rpx;
+  border-radius: 22rpx;
+  box-shadow: 0 4rpx 14rpx rgba(0,122,255,0.3);
+}
+.base-btn-loading { background: #c7c7cc; box-shadow: none; }
+
 .item {
   background: #fff;
   border-radius: 28rpx;
