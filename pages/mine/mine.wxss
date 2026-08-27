@@ -1,13 +1,62 @@
-.container { padding: 24rpx; }
-.header { font-size: 32rpx; font-weight: bold; padding: 20rpx 0; }
-.section-title { font-size: 30rpx; font-weight: bold; margin: 24rpx 0 12rpx; }
-.empty { color: #999; font-size: 26rpx; }
-.item { padding: 20rpx 0; border-bottom: 1rpx solid #eee; }
-.t { font-size: 30rpx; }
-.s { color: #999; font-size: 24rpx; margin-top: 4rpx; }
-.admin-btn { margin-top: 40rpx; }
+.page { padding: 24rpx; }
 
-/* 我的发布入口行 */
+/* 用户卡 */
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx 28rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+}
+.avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #07c160, #10d07a);
+  color: #fff;
+  font-size: 40rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.user-info { display: flex; flex-direction: column; gap: 10rpx; }
+.user-name { font-size: 32rpx; font-weight: 600; color: #333; }
+.user-role {
+  align-self: flex-start;
+  font-size: 22rpx;
+  color: #666;
+  background: #f2f2f2;
+  border-radius: 20rpx;
+  padding: 4rpx 16rpx;
+}
+.role-admin {
+  color: #fff;
+  background: #f0ad4e;
+}
+
+/* 分组 */
+.section { margin-top: 32rpx; }
+.section-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 16rpx;
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+.count {
+  font-size: 22rpx;
+  color: #07c160;
+  background: #e8f7ef;
+  border-radius: 16rpx;
+  padding: 2rpx 14rpx;
+}
+
+/* 入口行 */
 .entry-row {
   display: flex;
   justify-content: space-between;
@@ -15,10 +64,34 @@
   background: #fff;
   border-radius: 16rpx;
   padding: 28rpx 24rpx;
-  margin: 8rpx 0 16rpx;
+  margin-bottom: 16rpx;
   box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
 }
-.entry-left { display: flex; flex-direction: column; }
-.entry-title { font-size: 30rpx; font-weight: 600; color: #333; }
-.entry-sub { font-size: 24rpx; color: #999; margin-top: 6rpx; }
+.entry-left { display: flex; flex-direction: column; gap: 8rpx; }
+.entry-name { font-size: 30rpx; font-weight: 600; color: #333; }
+.entry-sub { font-size: 24rpx; color: #999; }
+
 .arrow { font-size: 40rpx; color: #c8c8c8; line-height: 1; }
+
+/* 收藏卡片 */
+.empty-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 60rpx 0;
+  text-align: center;
+  color: #999;
+  font-size: 26rpx;
+}
+.fav-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 26rpx 24rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+}
+.fav-main { display: flex; flex-direction: column; gap: 8rpx; }
+.fav-title { font-size: 30rpx; font-weight: 600; color: #333; }
+.fav-sub { font-size: 24rpx; color: #999; }

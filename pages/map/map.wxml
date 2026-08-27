@@ -15,7 +15,13 @@
   bindregionchange="onRegionChange"
 />
 
-<!-- 右下角统一操作区：发布为唯一主入口，定位/刷新收纳其下 -->
+<!-- 底部中间搜索入口：点击进入搜索页 -->
+<view class="search-bar" bindtap="goSearch">
+  <text class="search-icon">🔍</text>
+  <text class="search-text">搜索摆摊地点 / 分类</text>
+</view>
+
+<!-- 右下角统一操作区：发布为唯一主入口，定位/刷新收纳其下（位于搜索条上方） -->
 <view class="action-bar">
   <view class="publish-btn" bindtap="goPublish">
     <text class="publish-icon">＋</text>

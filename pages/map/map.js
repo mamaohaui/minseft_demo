@@ -143,4 +143,9 @@ Page({
   goPublish() {
     wx.navigateTo({ url: '/pages/publish/publish' })
   },
+
+  // 底部中间搜索入口：进搜索页（已从 tabBar 撤下，改为普通页面）
+  goSearch() {
+    wx.navigateTo({ url: '/pages/search/search' })
+  },
 })

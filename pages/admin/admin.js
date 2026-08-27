@@ -10,6 +10,27 @@ Page({
     if (r.ok) this.setData({ list: r.data })
   },
 
+  // 查看：跳转到地图页，居中并显示该申请（pending 版本）的坐标标志
+  viewOnMap(e) {
+    const id = e.currentTarget.dataset.id
+    const spot = this.data.list.find(s => s._id === id)
+    if (!spot) return
+    const p = spot.pending || {}
+    const loc = p.location || {}
+    if (typeof loc.lat !== 'number' || typeof loc.lng !== 'number') {
+      wx.showToast({ title: '该申请暂无坐标', icon: 'none' })
+      return
+    }
+    // switchTab 不能带参数，通过 globalData 传递目标点，地图页 onShow 消费
+    getApp().globalData.viewSpot = {
+      _id: spot._id,
+      title: p.title || '待审地点',
+      lat: loc.lat,
+      lng: loc.lng,
+    }
+    wx.switchTab({ url: '/pages/map/map' })
+  },
+
   async review(e) {
     const { id, action } = e.currentTarget.dataset
     let reason = ''

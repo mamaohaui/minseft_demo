@@ -1,11 +1,14 @@
 <view class="container">
   <view wx:if="{{list.length === 0}}" class="empty">暂无待审</view>
   <view wx:for="{{list}}" wx:key="_id" class="item">
-    <view class="t">{{item.pending.title}}</view>
+    <view class="row">
+      <view class="t">{{item.pending.title}}</view>
+      <view wx:if="{{item.current}}" class="tag">修改待审</view>
+      <view wx:else class="tag">新建待审</view>
+    </view>
     <view class="s">{{item.pending.category}} · {{item.pending.timeSlot}}</view>
-    <view wx:if="{{item.current}}" class="tag">修改待审</view>
-    <view wx:else class="tag">新建待审</view>
     <view class="btns">
+      <button size="mini" data-id="{{item._id}}" bindtap="viewOnMap">查看</button>
       <button size="mini" type="primary" data-id="{{item._id}}" data-action="approve" bindtap="review">通过</button>
       <button size="mini" type="warn" data-id="{{item._id}}" data-action="reject" bindtap="review">驳回</button>
     </view>

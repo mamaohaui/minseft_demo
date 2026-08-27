@@ -1,0 +1,116 @@
+.page { padding: 24rpx 24rpx 160rpx; }
+
+/* 分类筛选条 */
+.cats {
+  white-space: nowrap;
+  margin-bottom: 24rpx;
+}
+.cat {
+  display: inline-block;
+  padding: 12rpx 30rpx;
+  margin-right: 16rpx;
+  background: #fff;
+  color: #666;
+  font-size: 26rpx;
+  border-radius: 30rpx;
+  border: 1rpx solid #eee;
+}
+.cat-active {
+  background: #07c160;
+  color: #fff;
+  border-color: #07c160;
+  font-weight: 600;
+}
+
+.tip { text-align: center; color: #999; font-size: 26rpx; padding: 100rpx 0; }
+
+/* 资源卡片 */
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+.card-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.card-tag {
+  flex-shrink: 0;
+  background: #e8f7ef;
+  color: #07c160;
+  font-size: 22rpx;
+  padding: 4rpx 14rpx;
+  border-radius: 8rpx;
+}
+.card-content {
+  font-size: 26rpx;
+  color: #555;
+  line-height: 1.6;
+  margin-top: 14rpx;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+.card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18rpx;
+  padding-top: 18rpx;
+  border-top: 1rpx solid #f2f2f2;
+}
+.card-time { font-size: 22rpx; color: #bbb; }
+.card-contact {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  max-width: 60%;
+}
+.contact-label {
+  flex-shrink: 0;
+  font-size: 22rpx;
+  color: #07c160;
+  border: 1rpx solid #07c160;
+  border-radius: 6rpx;
+  padding: 2rpx 10rpx;
+}
+.contact-value {
+  font-size: 24rpx;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 发布资源悬浮按钮 */
+.fab {
+  position: fixed;
+  right: 30rpx;
+  bottom: calc(50rpx + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  background: #07c160;
+  color: #fff;
+  padding: 22rpx 36rpx;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  box-shadow: 0 6rpx 16rpx rgba(7,193,96,0.4);
+  z-index: 10;
+}
+.fab-icon { font-size: 32rpx; line-height: 1; }

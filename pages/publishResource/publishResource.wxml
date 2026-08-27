@@ -1,0 +1,48 @@
+<view class="page">
+  <view class="form-card">
+    <view class="field">
+      <view class="label">标题 <text class="req">*</text></view>
+      <input
+        class="input"
+        placeholder="例如：春熙路夜市摊位转让"
+        value="{{title}}"
+        bindinput="onTitle"
+        maxlength="30"
+      />
+    </view>
+
+    <view class="field">
+      <view class="label">分类 <text class="req">*</text></view>
+      <picker range="{{categories}}" value="{{categoryIndex}}" bindchange="onPick">
+        <view class="picker">{{categories[categoryIndex]}} <text class="picker-arrow">›</text></view>
+      </picker>
+    </view>
+
+    <view class="field">
+      <view class="label">详细说明 <text class="req">*</text></view>
+      <textarea
+        class="textarea"
+        placeholder="货源详情 / 摊位位置与价格 / 设备情况 / 合伙要求等"
+        value="{{content}}"
+        bindinput="onContent"
+        maxlength="500"
+        auto-height
+      />
+    </view>
+
+    <view class="field">
+      <view class="label">联系方式 <text class="req">*</text></view>
+      <input
+        class="input"
+        placeholder="手机号 / 微信号（对所有人可见）"
+        value="{{contact}}"
+        bindinput="onContact"
+        maxlength="50"
+      />
+    </view>
+  </view>
+
+  <button class="submit-btn" type="primary" bindtap="submit" disabled="{{submitting}}">
+    {{submitting ? '发布中…' : '发布资源'}}
+  </button>
+</view>

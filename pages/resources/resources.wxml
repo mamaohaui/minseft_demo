@@ -1,0 +1,37 @@
+<view class="page">
+  <!-- 分类筛选（横向滚动） -->
+  <scroll-view class="cats" scroll-x enhanced show-scrollbar="{{false}}">
+    <view
+      wx:for="{{categories}}"
+      wx:key="*this"
+      class="cat {{item === active ? 'cat-active' : ''}}"
+      data-c="{{item}}"
+      bindtap="onTapCategory"
+    >{{item}}</view>
+  </scroll-view>
+
+  <!-- 列表 -->
+  <view wx:if="{{loading}}" class="tip">加载中…</view>
+  <view wx:elif="{{list.length === 0}}" class="tip">该分类下暂无资源信息</view>
+
+  <view wx:for="{{list}}" wx:key="_id" class="card">
+    <view class="card-head">
+      <text class="card-title">{{item.title}}</text>
+      <text class="card-tag">{{item.category}}</text>
+    </view>
+    <view class="card-content">{{item.content}}</view>
+    <view class="card-foot">
+      <text class="card-time">{{item._time}}</text>
+      <view class="card-contact" data-contact="{{item.contact}}" bindtap="copyContact">
+        <text class="contact-label">联系</text>
+        <text class="contact-value">{{item.contact}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 发布资源入口 -->
+  <view class="fab" bindtap="goPublish">
+    <text class="fab-icon">＋</text>
+    <text>发布资源</text>
+  </view>
+</view>

@@ -1,0 +1,41 @@
+.page { padding: 24rpx; }
+
+.form-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 8rpx 24rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.05);
+}
+.field { padding: 24rpx 0; border-bottom: 1rpx solid #f2f2f2; }
+.field:last-child { border-bottom: none; }
+.label { font-size: 28rpx; font-weight: 600; color: #333; margin-bottom: 16rpx; }
+.req { color: #e64340; }
+
+.input {
+  background: #f7f7f7;
+  border-radius: 12rpx;
+  padding: 18rpx 20rpx;
+  font-size: 28rpx;
+}
+.textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: #f7f7f7;
+  border-radius: 12rpx;
+  padding: 18rpx 20rpx;
+  font-size: 28rpx;
+  min-height: 200rpx;
+}
+.picker {
+  background: #f7f7f7;
+  border-radius: 12rpx;
+  padding: 18rpx 20rpx;
+  font-size: 28rpx;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.picker-arrow { color: #bbb; font-size: 32rpx; }
+
+.submit-btn { margin-top: 40rpx; border-radius: 44rpx; }
