@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "摆摊神器"
+  "navigationBarTitleText": "摆摊神器",
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/index"
+  }
 }

@@ -1,1 +1,6 @@
-{ "navigationBarTitleText": "发布地点" }
+{
+  "navigationBarTitleText": "发布地点",
+  "usingComponents": {
+    "privacy-popup": "/components/privacy-popup/index"
+  }
+}

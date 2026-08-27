@@ -3,6 +3,25 @@ const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 
+// UGC 文本安全检测：risky / review 拦截；接口异常时放行（不阻塞主流程，仅记录日志）
+async function checkText(openid, text) {
+  if (!text) return true
+  try {
+    const res = await cloud.openapi.security.msgSecCheck({
+      version: 2,
+      scene: 3, // 3 = 社区发布内容
+      openid,
+      content: String(text).slice(0, 2500),
+    })
+    const suggest = res && res.result && res.result.suggest
+    if (suggest === 'risky' || suggest === 'review') return false
+    return true
+  } catch (e) {
+    console.warn('msgSecCheck 跳过（接口异常）', e.errCode || e.message)
+    return true
+  }
+}
+
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
   const { visibility, title, location, category, timeSlot, positionReq, mgmtReq, feeType, feeAmount } = event
@@ -13,6 +32,18 @@ exports.main = async (event) => {
   }
   if (!['public', 'vip', 'private'].includes(visibility)) {
     return { ok: false, code: 'INVALID', message: '可见性非法' }
+  }
+  if (typeof location.lng !== 'number' || typeof location.lat !== 'number') {
+    return { ok: false, code: 'INVALID', message: '坐标必须为数字' }
+  }
+
+  // 内容安全：标题 + 摆位要求 + 管理要求等用户输入合并检测（一次调用）
+  const textOk = await checkText(
+    OPENID,
+    [title, timeSlot, positionReq, mgmtReq, feeType].filter(Boolean).join('|'),
+  )
+  if (!textOk) {
+    return { ok: false, code: 'CONTENT_RISKY', message: '内容包含违规信息，请修改后重试' }
   }
 
   const content = {

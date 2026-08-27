@@ -1,0 +1,19 @@
+<view wx:if="{{show}}" class="pp-mask">
+  <view class="pp-panel">
+    <view class="pp-title">用户隐私保护提示</view>
+    <view class="pp-desc">
+      在使用定位、发布等功能前，请阅读并同意
+      <text class="pp-link">《用户隐私保护指引》</text>。
+      如不同意，你仍可浏览地图与公共数据，但定位、发布等功能将无法使用。
+    </view>
+    <view class="pp-btns">
+      <button class="pp-btn pp-ghost" hover-class="pp-pressed" bindtap="onReject">不同意</button>
+      <button
+        class="pp-btn pp-primary"
+        hover-class="pp-pressed"
+        open-type="agreePrivacyAuthorization"
+        bindagreeprivacyauthorization="onAgree"
+      >同意并继续</button>
+    </view>
+  </view>
+</view>

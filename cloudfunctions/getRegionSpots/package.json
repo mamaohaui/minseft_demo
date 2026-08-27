@@ -1,9 +1,0 @@
-{
-  "name": "getRegionSpots",
-  "version": "1.0.0",
-  "description": "下载某区域（省/市/县）的全部公共摊点",
-  "main": "index.js",
-  "dependencies": {
-    "wx-server-sdk": "~2.6.3"
-  }
-}

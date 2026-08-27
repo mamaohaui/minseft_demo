@@ -6,6 +6,25 @@ const db = cloud.database()
 // 允许的资源分类（前端 picker 同步维护）
 const CATEGORIES = ['货源供应', '摊位转让', '设备租赁', '合伙招募', '政策资讯', '其他']
 
+// UGC 文本安全检测：risky / review 拦截；接口异常时放行（不阻塞主流程，仅记录日志）
+async function checkText(openid, text) {
+  if (!text) return true
+  try {
+    const res = await cloud.openapi.security.msgSecCheck({
+      version: 2,
+      scene: 3, // 3 = 社区发布内容
+      openid,
+      content: String(text).slice(0, 2500),
+    })
+    const suggest = res && res.result && res.result.suggest
+    if (suggest === 'risky' || suggest === 'review') return false
+    return true
+  } catch (e) {
+    console.warn('msgSecCheck 跳过（接口异常）', e.errCode || e.message)
+    return true
+  }
+}
+
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
 
@@ -21,6 +40,12 @@ exports.main = async (event) => {
   if (content.length > 500) return { ok: false, message: '详细说明不能超过 500 字' }
   if (!contact) return { ok: false, message: '请填写联系方式' }
   if (contact.length > 50) return { ok: false, message: '联系方式过长' }
+
+  // 内容安全：标题 + 详细说明 + 联系方式合并检测（一次调用）
+  const textOk = await checkText(OPENID, [title, content, contact].join('|'))
+  if (!textOk) {
+    return { ok: false, code: 'CONTENT_RISKY', message: '内容包含违规信息，请修改后重试' }
+  }
 
   const now = Date.now()
   const res = await db.collection('resources').add({

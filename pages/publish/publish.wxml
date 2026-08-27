@@ -60,3 +60,6 @@
   <view class="submit-btn" hover-class="submit-pressed" hover-stay-time="60" bindtap="submit">提交审核</view>
   <view class="submit-hint">提交后由管理员审核，通过后将在地图显示</view>
 </view>
+
+<!-- 用户隐私保护授权弹窗（chooseLocation 场景） -->
+<privacy-popup />

@@ -3,12 +3,37 @@ const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 
+// UGC 文本安全检测：risky / review 拦截；接口异常时放行（不阻塞主流程，仅记录日志）
+async function checkText(openid, text) {
+  if (!text) return true
+  try {
+    const res = await cloud.openapi.security.msgSecCheck({
+      version: 2,
+      scene: 2, // 2 = 评论
+      openid,
+      content: String(text).slice(0, 2500),
+    })
+    const suggest = res && res.result && res.result.suggest
+    if (suggest === 'risky' || suggest === 'review') return false
+    return true
+  } catch (e) {
+    console.warn('msgSecCheck 跳过（接口异常）', e.errCode || e.message)
+    return true
+  }
+}
+
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext()
   const { spotId, rating, tags = [], content = '' } = event
 
   if (!spotId || !rating || rating < 1 || rating > 5) {
     return { ok: false, code: 'INVALID', message: '评分必须在 1-5 之间' }
+  }
+
+  // 内容安全：评价内容 + 标签合并检测（一次调用）
+  const textOk = await checkText(OPENID, [content].concat(tags || []).filter(Boolean).join('|'))
+  if (!textOk) {
+    return { ok: false, code: 'CONTENT_RISKY', message: '评价内容包含违规信息，请修改后重试' }
   }
 
   // 一人一评：已有评价则覆盖（防止刷分），更新 updatedAt

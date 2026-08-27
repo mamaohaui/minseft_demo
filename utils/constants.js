@@ -30,7 +30,7 @@ const VISIBILITY = [
 ]
 
 // 坐标 → 区域：就近归入成都区县（25km 内），超出归"其他地区"
-// 与云函数 listRegionPackages / getRegionSpots 的划分逻辑保持一致
+// 与云函数 listRegionPackages 的划分逻辑保持一致
 const regionOf = (lng, lat) => {
   let best = null
   let bestD = Infinity
