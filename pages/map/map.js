@@ -4,6 +4,7 @@ Page({
   data: {
     latitude: 30.657,
     longitude: 104.081,
+    scale: 16,
     markers: [],
     spots: [],
     loaded: false,    // 首次加载完成（控制空态提示闪现）
@@ -75,13 +76,13 @@ Page({
     this.loadNearby(this.data.longitude, this.data.latitude)
   },
 
-  // 地图移动后记录中心，供刷新使用
+  // 地图移动后记录中心，供刷新使用（值未变化时不 setData，避免触发地图重渲染打断缩放手势）
   onRegionChange(e) {
     if (e.type === 'end' && e.detail && e.detail.centerLocation) {
-      this.setData({
-        latitude: e.detail.centerLocation.latitude,
-        longitude: e.detail.centerLocation.longitude,
-      })
+      const c = e.detail.centerLocation
+      if (Math.abs(c.latitude - this.data.latitude) < 1e-9
+        && Math.abs(c.longitude - this.data.longitude) < 1e-9) return
+      this.setData({ latitude: c.latitude, longitude: c.longitude })
     }
   },
 

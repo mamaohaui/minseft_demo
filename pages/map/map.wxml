@@ -3,6 +3,11 @@
   class="map"
   latitude="{{latitude}}"
   longitude="{{longitude}}"
+  scale="{{scale}}"
+  min-scale="3"
+  max-scale="20"
+  enable-zoom
+  enable-scroll
   markers="{{markers}}"
   show-location
   bindmarkertap="onMarkerTap"
