@@ -1,29 +1,13 @@
 const { callCloud } = require('../../utils/cloud')
 
 Page({
-  data: { list: [], importing: false },
+  data: { list: [] },
 
   onShow() { this.load() },
 
   async load() {
     const r = await callCloud('adminList')
     if (r.ok) this.setData({ list: r.data })
-  },
-
-  // 一键导入公开摆摊基础数据库（seedSpots 云函数幂等，重复执行只补新增）
-  async importBase() {
-    if (this.data.importing) return
-    this.setData({ importing: true })
-    const r = await callCloud('seedSpots')
-    this.setData({ importing: false })
-    if (r.ok) {
-      const d = r.data || {}
-      wx.showToast({
-        title: `新增${d.added || 0}条，已存在${d.skipped || 0}条`,
-        icon: 'none',
-        duration: 2500,
-      })
-    }
   },
 
   // 查看：跳转到地图页，居中并显示该申请（pending 版本）的坐标标志

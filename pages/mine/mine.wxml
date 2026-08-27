@@ -41,6 +41,16 @@
       </view>
       <text class="arrow">›</text>
     </view>
+    <!-- 公开摆摊基础数据库导入（仅管理员；从管理员审核页迁移至此） -->
+    <view wx:if="{{user && user.isAdmin}}" class="entry-row row-divider">
+      <view class="entry-left">
+        <view class="entry-name">公开摆摊基础数据库</view>
+        <view class="entry-sub">预置成都早市 / 夜市 / 批发市场等基础点位</view>
+      </view>
+      <view class="import-btn {{importing ? 'import-btn-loading' : ''}}" hover-class="btn-pressed" hover-stay-time="60" catchtap="importBase">
+        {{importing ? '导入中…' : '导入'}}
+      </view>
+    </view>
   </view>
 
   <!-- 管理员审核：单独分组，放在下面（仅管理员可见） -->

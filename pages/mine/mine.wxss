@@ -83,5 +83,20 @@
 
 .arrow { font-size: 40rpx; color: #c7c7cc; line-height: 1; font-weight: 300; }
 
+/* 基础数据库导入按钮（iOS 蓝色胶囊） */
+.import-btn {
+  flex-shrink: 0;
+  align-self: center;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #fff;
+  background: #007aff;
+  padding: 12rpx 32rpx;
+  border-radius: 22rpx;
+  box-shadow: 0 4rpx 14rpx rgba(0,122,255,0.3);
+}
+.import-btn-loading { background: #c7c7cc; box-shadow: none; }
+
 /* 按下态（iOS 高亮灰） */
 .row-pressed { background: rgba(60,60,67,0.06); }
+.btn-pressed { opacity: 0.6; }

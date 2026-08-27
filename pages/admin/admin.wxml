@@ -1,15 +1,4 @@
 <view class="container">
-  <!-- 基础数据库工具行：一键导入公开摆摊基础数据（幂等，可重复执行） -->
-  <view class="base-tool">
-    <view class="base-info">
-      <view class="base-title">公开摆摊基础数据库</view>
-      <view class="base-desc">预置成都主要早市/夜市点位，作为初始地图数据</view>
-    </view>
-    <view class="base-btn {{importing ? 'base-btn-loading' : ''}}" hover-class="btn-pressed" hover-stay-time="60" bindtap="importBase">
-      {{importing ? '导入中…' : '导入'}}
-    </view>
-  </view>
-
   <view wx:if="{{list.length === 0}}" class="empty">暂无待审</view>
   <view wx:for="{{list}}" wx:key="_id" class="item">
     <view class="row">
