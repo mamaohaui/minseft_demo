@@ -4,6 +4,8 @@
     <view class="tip-title">⬇︎ 公共摆摊数据库</view>
     <view class="tip-text">这里是官方收集整理的公共摆摊基础数据（早市 / 夜市 / 农贸市场 / 批发市场等），按省 / 市 / 县下载，可整市一键下载或按区县单独下载。下载后地图「公共摊点」图层才会显示对应区域；你自己的发布、收藏和关注的地点不受影响、无需下载。</view>
     <view class="tip-text tip-sub">每次下载都会自动同步官方最新收集整理的基础点位，无需单独更新。</view>
+    <view class="tip-text tip-sub">1. 公共摆摊数据来自各渠道收集整理，使用前请多加注意、实地落实确认。</view>
+    <view class="tip-text tip-sub">2. 数据下载不宜过多，建议只下载自己需要的区域，常用点位可加入收藏。</view>
   </view>
 
   <view wx:if="{{loading}}" class="loading">加载中…</view>
