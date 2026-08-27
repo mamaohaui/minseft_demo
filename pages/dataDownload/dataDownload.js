@@ -40,6 +40,7 @@ Page({
         province: p.province,
         expanded: true,
         cities: Object.values(p.cities).map(c => ({
+          province: p.province,
           city: c.city,
           expanded: true,
           districts: c.districts,
@@ -152,7 +153,11 @@ Page({
       onlyDeploy.push('① seedSpots（基础数据更新+下载）')
     }
 
-    if (!lines.length) lines.push('云端公共数据为空')
+    if (!lines.length) {
+      const seedTotal = seed && seed.data && typeof seed.data.total === 'number' ? seed.data.total : 'N/A'
+      const seedSpotsLen = seed && seed.data && Array.isArray(seed.data.spots) ? seed.data.spots.length : 'N/A'
+      lines.push(`云端公共数据为空（seedSpots 总计=${seedTotal}，返回点位=${seedSpotsLen}，基础库=${baseTotal}；city=${city && city.province}-${city && city.city}）`)
+    }
 
     wx.showModal({
       title: '下载失败 · 诊断结果',
