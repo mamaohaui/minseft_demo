@@ -67,6 +67,35 @@
   font-size: 34rpx;
 }
 
+/* 头像：微信头像选择能力 */
+.avatar-field {
+  min-height: 140rpx;
+}
+.avatar-btn {
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  line-height: 1;
+}
+.avatar-btn::after {
+  border: none;
+}
+.avatar-preview {
+  width: 104rpx;
+  height: 104rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar-placeholder {
+  background: linear-gradient(135deg, #34c759, #30d158);
+  color: #fff;
+  font-size: 40rpx;
+  font-weight: 600;
+}
+
 .submit-btn {
   margin-top: 48rpx;
   background: #34c759;

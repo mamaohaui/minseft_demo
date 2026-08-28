@@ -1,29 +1,40 @@
 <view class="page">
   <view class="hero">
-    <view class="hero-title">欢迎加入摆摊神器</view>
-    <view class="hero-sub">完善个人信息，方便摊友互相认识、就近合作</view>
+    <view class="hero-title">完善个人信息</view>
+    <view class="hero-sub">用微信信息一键填写，仅电话必填，其余可留空</view>
   </view>
 
   <view class="form">
+    <!-- 头像：微信头像选择能力（open-type=chooseAvatar，无需授权弹窗） -->
+    <view class="field avatar-field">
+      <text class="label">头像</text>
+      <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" hover-class="none">
+        <image wx:if="{{avatarUrl}}" class="avatar-preview" src="{{avatarUrl}}" mode="aspectFill" />
+        <view wx:else class="avatar-preview avatar-placeholder">摊</view>
+      </button>
+    </view>
+    <!-- 昵称：微信昵称填写能力（键盘自动推荐微信昵称） -->
     <view class="field">
-      <text class="label">姓名 *</text>
-      <input class="input" value="{{name}}" bindinput="onName" maxlength="20" placeholder="你的称呼" />
+      <text class="label">昵称</text>
+      <input class="input" type="nickname" value="{{nickname}}" bindinput="onNickname" maxlength="20" placeholder="你的昵称（可一键同步微信昵称）" />
     </view>
     <view class="field">
       <text class="label">电话 *</text>
-      <input class="input" type="number" value="{{phone}}" bindinput="onPhone" maxlength="11" placeholder="11 位手机号" />
+      <input class="input" type="number" value="{{phone}}" bindinput="onPhone" maxlength="11" placeholder="11 位手机号（必填）" />
     </view>
     <view class="field-tip">手机号仅用于摊友间联系与安全核实，不会向其他用户公开</view>
-    <view class="field picker" bindtap="">
+    <!-- 是否有车辆：选填 -->
+    <view class="field picker">
       <text class="label">是否有车辆</text>
       <picker range="{{vehicleOpts}}" value="{{hasVehicleIdx}}" bindchange="onVehicleChange">
-        <view class="picker-value {{hasVehicle ? '' : 'placeholder'}}">{{hasVehicle}} <text class="chevron">›</text></view>
+        <view class="picker-value {{hasVehicle ? '' : 'placeholder'}}">{{hasVehicle || '暂不填写'}} <text class="chevron">›</text></view>
       </picker>
     </view>
+    <!-- 主要销售品类：选填 -->
     <view class="field picker">
-      <text class="label">主要销售品类 *</text>
+      <text class="label">主要销售品类</text>
       <picker range="{{categoryOpts}}" value="{{categoryIdx}}" bindchange="onCategoryChange">
-        <view class="picker-value {{category ? '' : 'placeholder'}}">{{category || '请选择'}} <text class="chevron">›</text></view>
+        <view class="picker-value {{category ? '' : 'placeholder'}}">{{category || '暂不填写'}} <text class="chevron">›</text></view>
       </picker>
     </view>
   </view>

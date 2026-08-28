@@ -21,6 +21,7 @@ exports.main = async () => {
       vipExpireAt: null,
       nickname: '',
       avatar: '',
+      avatarUrl: '',
       name: '',
       phone: '',
       hasVehicle: '',

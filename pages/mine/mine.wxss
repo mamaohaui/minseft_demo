@@ -19,7 +19,14 @@
   flex-shrink: 0;
   margin-right: 24rpx;
 }
-.name-edit { font-size: 22rpx; font-weight: 400; color: #007aff; margin-left: 12rpx; }
+.profile-avatar-img {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  background: #e9e9eb;
+  flex-shrink: 0;
+  margin-right: 24rpx;
+}
 .profile-name { font-size: 34rpx; font-weight: 600; color: #1c1c1e; }
 
 /* ===== 分组标题（iOS 节标题：小号灰字 + 字距） ===== */

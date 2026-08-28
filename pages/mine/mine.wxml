@@ -1,30 +1,16 @@
 <view class="page">
-  <!-- 个人信息总栏：昵称（游客/名字）+ 设置昵称 + 个人信息入口 -->
+  <!-- 个人信息入口：头像 + 昵称（游客/名字）+ 未完善提示，点击进入填写/编辑 -->
   <view class="section-title">个人信息</view>
   <view class="group-card">
-    <!-- 行1：昵称显示与设置 -->
-    <view class="entry-row profile-row" hover-class="row-pressed" hover-stay-time="80" bindtap="editNickname">
-      <view class="profile-avatar">{{avatarChar}}</view>
+    <view class="entry-row profile-row" hover-class="row-pressed" hover-stay-time="80" bindtap="goRegister">
+      <image wx:if="{{user && user.avatarUrl}}" class="profile-avatar-img" src="{{user.avatarUrl}}" mode="aspectFill" />
+      <view wx:else class="profile-avatar">{{avatarChar}}</view>
       <view class="entry-left">
         <view class="entry-name profile-name">
           {{displayName}}
-          <text class="name-edit">✎ 设置昵称</text>
-        </view>
-        <view class="entry-sub">{{roleText}}</view>
-      </view>
-      <text class="arrow">›</text>
-    </view>
-    <!-- 行2：个人信息（姓名/电话/车辆/品类）入口 -->
-    <view class="entry-row row-divider" hover-class="row-pressed" hover-stay-time="80" bindtap="goRegister">
-      <view class="entry-left">
-        <view class="entry-name">
-          个人信息
           <text wx:if="{{!profileCompleted}}" class="badge">未完善</text>
         </view>
-        <view class="entry-sub" wx:if="{{profileCompleted && user && user.category}}">
-          {{user.name}} · {{user.category}} · {{user.hasVehicle === 'yes' ? '有车辆' : '无车辆'}}
-        </view>
-        <view class="entry-sub" wx:else>填写姓名 / 电话 / 车辆 / 品类</view>
+        <view class="entry-sub">{{roleText}}</view>
       </view>
       <text class="arrow">›</text>
     </view>

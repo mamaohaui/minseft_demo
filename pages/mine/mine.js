@@ -1,5 +1,4 @@
 const { callCloud } = require('../../utils/cloud')
-const { ensureProfile } = require('../../utils/profile')
 
 Page({
   data: { user: null, favorites: [], mySpots: [], offlineCount: 0, profileCompleted: true, displayName: '游客', avatarChar: '摊', roleText: '身份加载中…' },
@@ -62,28 +61,5 @@ Page({
   // 数据管理：管理员可视化编辑云端点位
   goDataManage() {
     wx.navigateTo({ url: '/pages/dataManage/dataManage' })
-  },
-
-  // 设置发布者昵称（保存后同步回填到自己所有历史发布，供"按发布者"搜索）
-  async editNickname() {
-    // 改名属于注册后权限：游客先引导注册
-    if (!(await ensureProfile())) return
-    const current = (this.data.user && this.data.user.nickname) || ''
-    wx.showModal({
-      title: '设置昵称',
-      editable: true,
-      placeholderText: '用于发布地点时展示、被搜索（20 字内）',
-      content: current,
-      success: async (res) => {
-        if (!res.confirm) return
-        const nickname = (res.content || '').trim()
-        if (!nickname) return wx.showToast({ title: '昵称不能为空', icon: 'none' })
-        const r = await callCloud('setNickname', { nickname })
-        if (r.ok) {
-          wx.showToast({ title: '已保存', icon: 'success' })
-          this.setData({ 'user.nickname': nickname })
-        }
-      },
-    })
   },
 })
