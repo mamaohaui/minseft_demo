@@ -2,7 +2,7 @@ const { callCloud } = require('../../utils/cloud')
 const { ensureProfile } = require('../../utils/profile')
 
 Page({
-  data: { user: null, favorites: [], mySpots: [], offlineCount: 0, profileCompleted: true },
+  data: { user: null, favorites: [], mySpots: [], offlineCount: 0, profileCompleted: true, displayName: '游客', avatarChar: '摊', roleText: '身份加载中…' },
 
   onShow() { this.load() },
 
@@ -15,16 +15,27 @@ Page({
     ])
     // 已下载离线数据包数量（本地 storage，无需云端请求）
     const pkgs = wx.getStorageSync('offlineRegionPackages') || {}
+    const user = u.ok ? u.data : this.data.user
+    const profileCompleted = u.ok ? !!user.profileCompleted : this.data.profileCompleted
+    // 昵称行显示：未注册 → 游客；已注册 → 昵称（未设置则显示姓名）
+    const displayName = profileCompleted ? (user.nickname || user.name || '摊友') : '游客'
+    let roleText = '完善个人信息后可发布、收藏、关注'
+    if (profileCompleted) {
+      roleText = user.isAdmin ? '管理员 · 昵称用于发布展示' : '昵称用于发布展示与被搜索'
+    }
     this.setData({
-      user: u.ok ? u.data : this.data.user,
+      user,
       favorites: f.ok ? f.data : this.data.favorites,
       mySpots: m.ok ? m.data : this.data.mySpots,
       offlineCount: Object.keys(pkgs).length,
-      profileCompleted: u.ok ? !!u.data.profileCompleted : this.data.profileCompleted,
+      profileCompleted,
+      displayName,
+      avatarChar: displayName === '游客' ? '摊' : displayName.charAt(0),
+      roleText,
     })
   },
 
-  // 注册/经营资料：未完成时高亮引导，已完成可查看编辑
+  // 个人信息（姓名/电话/车辆/品类）：未完成时高亮引导，已完成可查看编辑
   goRegister() {
     wx.navigateTo({ url: '/pages/register/register' })
   },

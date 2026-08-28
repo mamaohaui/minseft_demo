@@ -1,6 +1,6 @@
-// 云函数 saveUserProfile：保存用户注册/经营资料
+// 云函数 saveUserProfile：保存用户个人信息（姓名/电话/车辆/品类）
 // 字段：姓名、电话、是否有车辆、主要销售品类
-// 写入 users 集合（openid 为 _id），profileCompleted 标记注册完成
+// 写入 users 集合（openid 为 _id），profileCompleted 标记个人信息已完善
 const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()

@@ -21,7 +21,7 @@ Page({
 
   async submit() {
     if (this.data.submitting) return
-    // 未完善注册资料先引导注册（发布前必填）
+    // 未完善个人信息先引导填写（发布前必填）
     const ok = await ensureProfile()
     if (!ok) return
     const { title, content, contact, categories, categoryIndex } = this.data

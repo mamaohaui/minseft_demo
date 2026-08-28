@@ -1,4 +1,4 @@
-// 注册 / 经营资料页：首次使用收集姓名、电话、是否有车辆、主要销售品类
+// 个人信息页：首次使用收集姓名、电话、是否有车辆、主要销售品类
 const { callCloud } = require('../../utils/cloud')
 
 const VEHICLE_OPTS = ['是', '否']
@@ -67,7 +67,7 @@ Page({
     wx.hideLoading()
     this.setData({ submitting: false })
     if (r.ok) {
-      wx.showToast({ title: '注册成功', icon: 'success' })
+      wx.showToast({ title: '已保存', icon: 'success' })
       getApp().globalData.userProfile = {
         ...(getApp().globalData.userProfile || {}),
         name: nameT,

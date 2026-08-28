@@ -33,6 +33,13 @@
 .field:last-child {
   border-bottom: none;
 }
+.field-tip {
+  padding: 16rpx 4rpx 20rpx;
+  font-size: 22rpx;
+  color: #8e8e93;
+  line-height: 1.5;
+  border-bottom: 1rpx solid #e5e5ea;
+}
 .label {
   width: 220rpx;
   font-size: 30rpx;

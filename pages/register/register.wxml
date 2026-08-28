@@ -1,7 +1,7 @@
 <view class="page">
   <view class="hero">
     <view class="hero-title">欢迎加入摆摊神器</view>
-    <view class="hero-sub">完善经营资料，方便摊友互相认识、就近合作</view>
+    <view class="hero-sub">完善个人信息，方便摊友互相认识、就近合作</view>
   </view>
 
   <view class="form">
@@ -13,6 +13,7 @@
       <text class="label">电话 *</text>
       <input class="input" type="number" value="{{phone}}" bindinput="onPhone" maxlength="11" placeholder="11 位手机号" />
     </view>
+    <view class="field-tip">手机号仅用于摊友间联系与安全核实，不会向其他用户公开</view>
     <view class="field picker" bindtap="">
       <text class="label">是否有车辆</text>
       <picker range="{{vehicleOpts}}" value="{{hasVehicleIdx}}" bindchange="onVehicleChange">
@@ -27,6 +28,6 @@
     </view>
   </view>
 
-  <view class="submit-btn" hover-class="submit-pressed" hover-stay-time="60" bindtap="submit">保存资料</view>
-  <view class="submit-hint">你的资料仅用于平台内展示与联系，不会对外公开电话</view>
+  <view class="submit-btn" hover-class="submit-pressed" hover-stay-time="60" bindtap="submit">保存</view>
+  <view class="submit-hint">提交即表示同意《用户隐私保护指引》中的信息收集规则，手机号仅用于摊友间联系，不会公开展示</view>
 </view>
