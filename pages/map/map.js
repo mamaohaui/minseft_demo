@@ -1,6 +1,5 @@
 const { callCloud } = require('../../utils/cloud')
 const { REGIONS, regionOf } = require('../../utils/constants')
-const { checkProfile } = require('../../utils/profile')
 
 const FOCUS_MARKER_ID = 999999 // 「查看」目标标志固定 id
 const DEFAULT_REGION = REGIONS[0] // 定位失败时的兜底：默认地区（列表首个区县）
@@ -81,8 +80,6 @@ Page({
     // 每次回地图页静默刷新收藏+关注（详情页收藏/关注/取关后图层即时生效）
     this.refreshFavs()
     this.refreshFollowed()
-    // 首次启动注册引导（静默检测 + 全局只弹一次，不阻塞主流程）
-    this.guideRegister()
     const target = getApp().globalData.viewSpot
     if (!target) return
     getApp().globalData.viewSpot = null
@@ -95,23 +92,6 @@ Page({
       markers: [this.buildFocusMarker(target)],
     })
     this.loadNearby(target.lng, target.lat, target)
-  },
-
-  // 首次使用注册引导：未注册且从未提示过则弹一次（storage 防重复打扰）
-  async guideRegister() {
-    if (wx.getStorageSync('registerGuideShown')) return
-    const done = await checkProfile()
-    if (done) return
-    wx.setStorageSync('registerGuideShown', 1)
-    wx.showModal({
-      title: '欢迎加入摆摊神器',
-      content: '完善经营资料（姓名、电话、车辆、品类），方便摊友认识与合作，仅需一次。',
-      confirmText: '去填写',
-      cancelText: '稍后',
-      success: (res) => {
-        if (res.confirm) wx.navigateTo({ url: '/pages/register/register' })
-      },
-    })
   },
 
   // 目标标志：查看跳转专用 marker（固定 id，点击进详情，不受图层开关影响）

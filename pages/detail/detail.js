@@ -1,4 +1,5 @@
 const { callCloud } = require('../../utils/cloud')
+const { ensureProfile } = require('../../utils/profile')
 
 const REVIEW_TAGS = [
   { name: '人流大', selected: false },
@@ -48,6 +49,8 @@ Page({
   },
 
   async toggleFav() {
+    // 收藏属于注册后权限：游客先引导注册
+    if (!(await ensureProfile())) return
     const r = await callCloud('toggleFavorite', { spotId: this.spotId })
     if (r.ok) this.setData({ favorited: r.data.favorited })
   },
@@ -56,6 +59,8 @@ Page({
   async toggleFollow() {
     const spot = this.data.spot
     if (!spot || !spot.creatorOpenid) return
+    // 关注属于注册后权限：游客先引导注册
+    if (!(await ensureProfile())) return
     const r = await callCloud('toggleFollow', { targetOpenid: spot.creatorOpenid })
     if (r.ok) {
       this.setData({ followed: !!r.data.followed })
@@ -111,6 +116,8 @@ Page({
   },
 
   async submitReview() {
+    // 写评价属于注册后权限（内容发布）：游客先引导注册
+    if (!(await ensureProfile())) return
     const f = this.data.form
     if (f.rating < 1) return wx.showToast({ title: '请选择星级', icon: 'none' })
     if (this.data.submitting) return
