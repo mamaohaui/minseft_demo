@@ -1,9 +1,9 @@
-// 个人信息页：微信头像昵称填写能力 + 电话（必填，强校验）+ 车辆/品类（选填）
+// 个人信息页：微信头像昵称填写能力 + 手机号（必填，强校验）+ 车辆/品类（选填）
 const { callCloud } = require('../../utils/cloud')
 
 const VEHICLE_OPTS = ['暂不填写', '是', '否']
 const CATEGORY_OPTS = ['暂不填写', '餐饮小吃', '水果生鲜', '服装服饰', '日用百货', '手工艺品', '儿童玩具', '其他']
-// 电话号段校验：1 开头 + 3-9 第二位（覆盖所有大陆号段），前后端双重校验
+// 手机号号段校验：1 开头 + 3-9 第二位（覆盖所有大陆号段），前后端双重校验
 const PHONE_RE = /^1[3-9]\d{9}$/
 
 Page({
@@ -81,7 +81,7 @@ Page({
     const nicknameT = nickname.trim()
     const phoneT = phone.trim()
 
-    // 电话必填 + 格式/号段强校验
+    // 手机号必填 + 格式/号段强校验
     if (!PHONE_RE.test(phoneT)) {
       return wx.showToast({ title: '请输入正确的 11 位手机号', icon: 'none' })
     }

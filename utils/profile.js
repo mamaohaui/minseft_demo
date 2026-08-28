@@ -9,7 +9,7 @@ async function ensureProfile() {
   return new Promise(resolve => {
     wx.showModal({
       title: '请先完善个人信息',
-      content: '使用发布、收藏、关注等功能前，需填写姓名、电话、车辆与销售品类（仅需一次，用于摊友间联系）',
+      content: '使用发布、收藏、关注等功能前，需填写姓名、手机号、车辆与销售品类（仅需一次，用于摊友间联系）',
       confirmText: '去填写',
       cancelText: '取消',
       success: (res) => {

@@ -33,13 +33,6 @@
 .field:last-child {
   border-bottom: none;
 }
-.field-tip {
-  padding: 16rpx 4rpx 20rpx;
-  font-size: 22rpx;
-  color: #8e8e93;
-  line-height: 1.5;
-  border-bottom: 1rpx solid #e5e5ea;
-}
 .label {
   width: 220rpx;
   font-size: 30rpx;
@@ -112,4 +105,9 @@
   text-align: center;
   font-size: 24rpx;
   color: #8e8e93;
+}
+.submit-hint-muted {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #aeaeb2;
 }

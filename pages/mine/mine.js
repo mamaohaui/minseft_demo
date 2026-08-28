@@ -34,7 +34,7 @@ Page({
     })
   },
 
-  // 个人信息（姓名/电话/车辆/品类）：未完成时高亮引导，已完成可查看编辑
+  // 个人信息（姓名/手机号/车辆/品类）：未完成时高亮引导，已完成可查看编辑
   goRegister() {
     wx.navigateTo({ url: '/pages/register/register' })
   },

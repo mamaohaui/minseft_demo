@@ -1,12 +1,12 @@
 // 云函数 saveUserProfile：保存用户个人信息
-// 字段：头像(avatarUrl)、昵称(nickname)、电话(phone 必填+号段强校验)、是否有车辆、主要销售品类（后两者选填）
+// 字段：头像(avatarUrl)、昵称(nickname)、手机号(phone 必填+号段强校验)、是否有车辆、主要销售品类（后两者选填）
 // 写入 users 集合（openid 为 _id），profileCompleted 标记个人信息已完善
 const cloud = require('wx-server-sdk')
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 const db = cloud.database()
 
 const CATEGORIES = ['餐饮小吃', '水果生鲜', '服装服饰', '日用百货', '手工艺品', '儿童玩具', '其他']
-// 电话校验：1 开头 + 3-9 第二位（覆盖大陆全部号段），前端/云端双重校验防止绕过
+// 手机号校验：1 开头 + 3-9 第二位（覆盖大陆全部号段），前端/云端双重校验防止绕过
 const PHONE_RE = /^1[3-9]\d{9}$/
 
 async function secCheck(content) {
@@ -28,7 +28,7 @@ exports.main = async (event) => {
   const hasVehicle = (event.hasVehicle || '').trim()
   const category = (event.category || '').trim()
 
-  // 电话必填 + 号段强校验
+  // 手机号必填 + 号段强校验
   if (!PHONE_RE.test(phone)) {
     return { ok: false, code: 'INVALID', message: '请输入正确的 11 位手机号' }
   }
