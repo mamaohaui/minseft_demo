@@ -1,44 +1,10 @@
 <view class="page">
-  <!-- 分类筛选（横向滚动，iOS 选中实心绿） -->
-  <scroll-view class="cats" scroll-x enhanced show-scrollbar="{{false}}">
-    <view
-      wx:for="{{categories}}"
-      wx:key="*this"
-      class="cat {{item === active ? 'cat-active' : ''}}"
-      hover-class="chip-pressed" hover-stay-time="60"
-      data-c="{{item}}"
-      bindtap="onTapCategory"
-    >{{item}}</view>
-  </scroll-view>
-
-  <!-- 列表 -->
-  <view wx:if="{{loading && list.length === 0}}" class="tip">加载中…</view>
-  <view wx:elif="{{notDeployed}}" class="tip">云函数 listResources 未部署，请在开发者工具左侧展开 cloudfunctions，右键 listResources 选择「上传并部署：云端安装依赖」后重进本页</view>
-  <view wx:elif="{{list.length === 0}}" class="tip">该分类下暂无资源信息</view>
-
-  <scroll-view wx:else class="list-scroll" scroll-y bindscrolltolower="loadMore" lower-threshold="100">
-    <view wx:for="{{list}}" wx:key="_id" class="card" hover-class="card-pressed" hover-stay-time="80">
-      <view class="card-head">
-        <text class="card-title">{{item.title}}</text>
-        <text class="card-tag">{{item.category}}</text>
-      </view>
-      <view class="card-content">{{item.content}}</view>
-      <view class="card-foot">
-        <text class="card-time">{{item._time}}</text>
-        <view class="card-contact" hover-class="link-pressed" hover-stay-time="60"
-              data-contact="{{item.contact}}" bindtap="copyContact">
-          <text class="contact-label">联系</text>
-          <text class="contact-value">{{item.contact}}</text>
-        </view>
-      </view>
+  <view class="placeholder">
+    <view class="placeholder-icon">
+      <text class="placeholder-icon-text">拓</text>
     </view>
-    <view wx:if="{{hasMore}}" class="tip load-more">上拉加载更多</view>
-    <view wx:elif="{{list.length > 0}}" class="tip load-more">已经到底啦</view>
-  </scroll-view>
-
-  <!-- 发布资源入口（iOS 胶囊悬浮钮） -->
-  <view class="fab" hover-class="fab-pressed" hover-stay-time="80" bindtap="goPublish">
-    <text class="fab-icon">＋</text>
-    <text>发布资源</text>
+    <view class="placeholder-badge">开发中</view>
+    <view class="placeholder-title">待开放项目</view>
+    <view class="placeholder-sub">资源拓展（货源供应 / 摊位转让 / 设备租赁 / 合伙招募）正在开发中，敬请期待</view>
   </view>
 </view>
