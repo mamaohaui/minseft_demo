@@ -1,5 +1,6 @@
 const { callCloud } = require('../../utils/cloud')
 const { CATEGORIES, TIME_SLOTS, FEE_TYPES, VISIBILITY } = require('../../utils/constants')
+const { ensureProfile } = require('../../utils/profile')
 
 Page({
   data: {
@@ -75,6 +76,9 @@ Page({
   },
 
   async submit() {
+    // 未完善注册资料先引导注册（发布前必填）
+    const ok = await ensureProfile()
+    if (!ok) return
     const f = this.data.form
     if (!f.title) return wx.showToast({ title: '请填标题', icon: 'none' })
     if (!this.data.location) return wx.showToast({ title: '请选择坐标', icon: 'none' })

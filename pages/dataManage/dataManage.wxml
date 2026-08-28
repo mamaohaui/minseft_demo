@@ -1,0 +1,96 @@
+<view class="page">
+  <!-- 顶部切换 -->
+  <view class="seg">
+    <view class="seg-item {{tab === 'base' ? 'seg-on' : ''}}" data-tab="base" bindtap="switchTab">公共基础库</view>
+    <view class="seg-item {{tab === 'user' ? 'seg-on' : ''}}" data-tab="user" bindtap="switchTab">用户发布</view>
+  </view>
+
+  <!-- 公共基础库 -->
+  <scroll-view wx:if="{{tab === 'base'}}" class="list" scroll-y bindscrolltolower="loadMoreBase" lower-threshold="80">
+    <view wx:if="{{baseList.length === 0 && !loadingBase}}" class="empty">暂无公共基础库点位</view>
+    <view wx:for="{{baseList}}" wx:key="_id" class="card">
+      <view class="card-head">
+        <text class="card-title">{{item.title}}</text>
+        <text class="card-tag">{{item.category || '未分类'}}</text>
+      </view>
+      <view class="card-line" wx:if="{{item.timeSlot}}">时段：{{item.timeSlot}}</view>
+      <view class="card-line">费用：{{item.feeType || '免费'}}{{item.feeAmount ? ' ' + item.feeAmount + '元' : ''}}</view>
+      <view class="card-line coords" wx:if="{{item.lng != null && item.lat != null}}">
+        {{item.lng.toFixed(5)}}, {{item.lat.toFixed(5)}}
+      </view>
+      <view class="card-actions">
+        <view class="act act-edit" hover-class="act-pressed" hover-stay-time="60" data-id="{{item._id}}" bindtap="openEdit">编辑</view>
+        <view class="act act-del" hover-class="act-pressed" hover-stay-time="60" data-id="{{item._id}}" bindtap="delSpot">删除</view>
+      </view>
+    </view>
+    <view wx:if="{{baseHasMore && baseList.length}}" class="tip">上拉加载更多</view>
+    <view wx:elif="{{baseList.length}}" class="tip">共 {{baseList.length}}+ 条</view>
+  </scroll-view>
+
+  <!-- 用户发布 -->
+  <scroll-view wx:else class="list" scroll-y bindscrolltolower="loadMoreUser" lower-threshold="80">
+    <view wx:if="{{userList.length === 0 && !loadingUser}}" class="empty">暂无用户发布</view>
+    <view wx:for="{{userList}}" wx:key="_id" class="card">
+      <view class="card-head">
+        <text class="card-title">{{item.title}}</text>
+        <text class="st {{item._statusClass}}">{{item._statusText}}</text>
+      </view>
+      <view class="card-line" wx:if="{{item.creatorName}}">发布者：{{item.creatorName}}</view>
+      <view class="card-line" wx:if="{{item.category}}">分类：{{item.category}} · {{item.timeSlot || '时间未填'}}</view>
+      <view class="card-line" wx:if="{{item._time}}">发布时间：{{item._time}}</view>
+      <view class="card-actions">
+        <block wx:if="{{item.status !== 'approved'}}">
+          <view class="act act-ok" hover-class="act-pressed" hover-stay-time="60"
+                data-id="{{item._id}}" data-status="approved" bindtap="changeStatus">通过</view>
+        </block>
+        <block wx:if="{{item.status === 'approved'}}">
+          <view class="act act-no" hover-class="act-pressed" hover-stay-time="60"
+                data-id="{{item._id}}" data-status="rejected" bindtap="changeStatus">下架</view>
+        </block>
+        <view class="act act-del" hover-class="act-pressed" hover-stay-time="60"
+              data-id="{{item._id}}" bindtap="delSpot">删除</view>
+      </view>
+    </view>
+    <view wx:if="{{userHasMore && userList.length}}" class="tip">上拉加载更多</view>
+    <view wx:elif="{{userList.length}}" class="tip">共 {{userList.length}}+ 条</view>
+  </scroll-view>
+
+  <!-- 编辑弹窗 -->
+  <view wx:if="{{showEdit}}" class="mask" bindtap="closeEdit">
+    <view class="panel" catchtap="noop">
+      <view class="panel-title">编辑点位</view>
+      <view class="field">
+        <text class="label">标题 *</text>
+        <input class="input" value="{{editForm.title}}" data-k="title" bindinput="onField" placeholder="点位名称" />
+      </view>
+      <view class="field">
+        <text class="label">分类</text>
+        <input class="input" value="{{editForm.category}}" data-k="category" bindinput="onField" placeholder="如：夜市 / 农贸市场" />
+      </view>
+      <view class="field">
+        <text class="label">时段</text>
+        <input class="input" value="{{editForm.timeSlot}}" data-k="timeSlot" bindinput="onField" placeholder="如：18:00-24:00" />
+      </view>
+      <view class="field">
+        <text class="label">收费类型</text>
+        <input class="input" value="{{editForm.feeType}}" data-k="feeType" bindinput="onField" placeholder="如：免费 / 收费 / 押金" />
+      </view>
+      <view class="field">
+        <text class="label">费用(元)</text>
+        <input class="input" type="digit" value="{{editForm.feeAmount}}" data-k="feeAmount" bindinput="onField" placeholder="0" />
+      </view>
+      <view class="field">
+        <text class="label">经度 *</text>
+        <input class="input" type="digit" value="{{editForm.lng}}" data-k="lng" bindinput="onField" placeholder="104.xxxxx" />
+      </view>
+      <view class="field">
+        <text class="label">纬度 *</text>
+        <input class="input" type="digit" value="{{editForm.lat}}" data-k="lat" bindinput="onField" placeholder="30.xxxxx" />
+      </view>
+      <view class="panel-btns">
+        <view class="pbtn pbtn-cancel" hover-class="act-pressed" hover-stay-time="60" bindtap="closeEdit">取消</view>
+        <view class="pbtn pbtn-save" hover-class="act-pressed" hover-stay-time="60" bindtap="saveEdit">保存</view>
+      </view>
+    </view>
+  </view>
+</view>

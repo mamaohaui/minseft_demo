@@ -1,0 +1,32 @@
+<view class="page">
+  <view class="hero">
+    <view class="hero-title">欢迎加入摆摊神器</view>
+    <view class="hero-sub">完善经营资料，方便摊友互相认识、就近合作</view>
+  </view>
+
+  <view class="form">
+    <view class="field">
+      <text class="label">姓名 *</text>
+      <input class="input" value="{{name}}" bindinput="onName" maxlength="20" placeholder="你的称呼" />
+    </view>
+    <view class="field">
+      <text class="label">电话 *</text>
+      <input class="input" type="number" value="{{phone}}" bindinput="onPhone" maxlength="11" placeholder="11 位手机号" />
+    </view>
+    <view class="field picker" bindtap="">
+      <text class="label">是否有车辆</text>
+      <picker range="{{vehicleOpts}}" value="{{hasVehicleIdx}}" bindchange="onVehicleChange">
+        <view class="picker-value {{hasVehicle ? '' : 'placeholder'}}">{{hasVehicle}} <text class="chevron">›</text></view>
+      </picker>
+    </view>
+    <view class="field picker">
+      <text class="label">主要销售品类 *</text>
+      <picker range="{{categoryOpts}}" value="{{categoryIdx}}" bindchange="onCategoryChange">
+        <view class="picker-value {{category ? '' : 'placeholder'}}">{{category || '请选择'}} <text class="chevron">›</text></view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="submit-btn" hover-class="submit-pressed" hover-stay-time="60" bindtap="submit">保存资料</view>
+  <view class="submit-hint">你的资料仅用于平台内展示与联系，不会对外公开电话</view>
+</view>

@@ -1,7 +1,7 @@
 const { callCloud } = require('../../utils/cloud')
 
 Page({
-  data: { user: null, favorites: [], mySpots: [], offlineCount: 0 },
+  data: { user: null, favorites: [], mySpots: [], offlineCount: 0, profileCompleted: true },
 
   onShow() { this.load() },
 
@@ -19,7 +19,13 @@ Page({
       favorites: f.ok ? f.data : this.data.favorites,
       mySpots: m.ok ? m.data : this.data.mySpots,
       offlineCount: Object.keys(pkgs).length,
+      profileCompleted: u.ok ? !!u.data.profileCompleted : this.data.profileCompleted,
     })
+  },
+
+  // 注册/经营资料：未完成时高亮引导，已完成可查看编辑
+  goRegister() {
+    wx.navigateTo({ url: '/pages/register/register' })
   },
 
   // 我的发布：独立管理页（查看/编辑/删除）
@@ -39,6 +45,11 @@ Page({
 
   goAdmin() {
     wx.navigateTo({ url: '/pages/admin/admin' })
+  },
+
+  // 数据管理：管理员可视化编辑云端点位
+  goDataManage() {
+    wx.navigateTo({ url: '/pages/dataManage/dataManage' })
   },
 
   // 设置发布者昵称（保存后同步回填到自己所有历史发布，供"按发布者"搜索）

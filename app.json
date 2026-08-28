@@ -10,7 +10,9 @@
     "pages/admin/admin",
     "pages/mySpots/mySpots",
     "pages/favorites/favorites",
-    "pages/dataDownload/dataDownload"
+    "pages/dataDownload/dataDownload",
+    "pages/register/register",
+    "pages/dataManage/dataManage"
   ],
   "window": {
     "navigationBarTextStyle": "black",

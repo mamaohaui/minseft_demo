@@ -1,0 +1,79 @@
+.page {
+  min-height: 100vh;
+  background: #f2f2f7;
+  padding: 0 32rpx 60rpx;
+  box-sizing: border-box;
+}
+
+.hero {
+  padding: 64rpx 8rpx 40rpx;
+}
+.hero-title {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #111;
+}
+.hero-sub {
+  font-size: 28rpx;
+  color: #8e8e93;
+  margin-top: 12rpx;
+}
+
+.form {
+  background: #ffffff;
+  border-radius: 20rpx;
+  padding: 8rpx 28rpx;
+}
+.field {
+  display: flex;
+  align-items: center;
+  min-height: 108rpx;
+  border-bottom: 1rpx solid #e5e5ea;
+}
+.field:last-child {
+  border-bottom: none;
+}
+.label {
+  width: 220rpx;
+  font-size: 30rpx;
+  color: #111;
+  flex-shrink: 0;
+}
+.input {
+  flex: 1;
+  font-size: 30rpx;
+  text-align: right;
+}
+.picker {
+  justify-content: space-between;
+}
+.picker-value {
+  font-size: 30rpx;
+  color: #111;
+}
+.picker-value.placeholder {
+  color: #c7c7cc;
+}
+.chevron {
+  color: #c7c7cc;
+  margin-left: 8rpx;
+  font-size: 34rpx;
+}
+
+.submit-btn {
+  margin-top: 48rpx;
+  background: #34c759;
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: 600;
+  text-align: center;
+  padding: 24rpx 0;
+  border-radius: 16rpx;
+}
+.submit-pressed { opacity: 0.85; }
+.submit-hint {
+  margin-top: 20rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #8e8e93;
+}

@@ -81,6 +81,18 @@
 .entry-name { font-size: 31rpx; font-weight: 500; color: #1c1c1e; }
 .entry-sub { font-size: 24rpx; color: #8e8e93; }
 
+/* 未完善标记 */
+.badge {
+  font-size: 20rpx;
+  font-weight: 400;
+  color: #fff;
+  background: #ff9500;
+  border-radius: 999rpx;
+  padding: 2rpx 14rpx;
+  margin-left: 12rpx;
+  vertical-align: middle;
+}
+
 .arrow { font-size: 40rpx; color: #c7c7cc; line-height: 1; font-weight: 300; }
 
 /* 按下态（iOS 高亮灰） */

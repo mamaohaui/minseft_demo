@@ -21,6 +21,11 @@ exports.main = async () => {
       vipExpireAt: null,
       nickname: '',
       avatar: '',
+      name: '',
+      phone: '',
+      hasVehicle: '',
+      category: '',
+      profileCompleted: false,
       createdAt: db.serverDate(),
       updatedAt: db.serverDate(),
     }
@@ -28,6 +33,8 @@ exports.main = async () => {
     user = newUser
   }
 
+  // 注册完成判定：已有手机号即视为完成（兼容老用户无此字段）
+  const profileCompleted = !!(user.profileCompleted || user.phone)
   const admins = (process.env.adminOpenids || '').split(',').map(s => s.trim())
-  return { ok: true, data: { _id: OPENID, ...user, isAdmin: admins.includes(OPENID) } }
+  return { ok: true, data: { _id: OPENID, ...user, profileCompleted, isAdmin: admins.includes(OPENID) } }
 }
